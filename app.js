@@ -1486,10 +1486,9 @@ class FamilyTreeApp {
         const modal = document.getElementById('profileModal');
         const photo = document.getElementById('profileModalPhoto');
         const name = document.getElementById('profileModalName');
-        const relationship = document.getElementById('profileModalRelationship');
         const details = document.getElementById('profileModalDetails');
 
-        if (!modal || !photo || !name || !relationship || !details) return;
+        if (!modal || !photo || !name || !details) return;
 
         // Set photo or initials
         photo.innerHTML = '';
@@ -1506,7 +1505,6 @@ class FamilyTreeApp {
         }
 
         name.textContent = person.name;
-        relationship.textContent = person.relationship;
 
         // Build details
         const detailsHTML = [];
