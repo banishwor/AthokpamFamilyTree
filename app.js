@@ -1255,9 +1255,9 @@ class FamilyTreeApp {
 
     // Get relationship label (Son/Daughter) from person's relationship field
     getRelationshipLabel(person) {
-        if (person.relationship.includes('Son') || person.relationship.includes('Grandson')) {
+        if (person.relationship.includes('Son') || person.relationship.includes('Grandson') || person.relationship.includes('Great-grandson')) {
             return 'Son';
-        } else if (person.relationship.includes('Daughter') || person.relationship.includes('Granddaughter')) {
+        } else if (person.relationship.includes('Daughter') || person.relationship.includes('Granddaughter') || person.relationship.includes('Great-granddaughter')) {
             return 'Daughter';
         }
         return 'Child'; // Fallback
