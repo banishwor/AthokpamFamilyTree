@@ -81,7 +81,7 @@ class FamilyTreeApp {
                 "generation": 1,
                 "parents": ["shamu-athokpam", "mangolnganbi-athokpam"], 
                 "spouse": "ngambi-athokpam",
-                "children": ["jobistra-athokpam", "bandana-athokpam", "bandeshowri-athokpam", "reteshwori-athokpam"],
+                "children": ["jobistra-athokpam", "bandana-athokpam", "bandeshwori-athokpam", "reteshwori-athokpam"],
                 "relationship": "Son (3rd)"
             },
             {
@@ -248,7 +248,7 @@ class FamilyTreeApp {
                 "generation": 1,
                 "parents": [],
                 "spouse": "indu-athokpam",
-                "children": ["jobistra-athokpam", "bandana-athokpam", "bandeshowri-athokpam", "reteshwori-athokpam"],
+                "children": ["jobistra-athokpam", "bandana-athokpam", "bandeshwori-athokpam", "reteshwori-athokpam"],
                 "relationship": "Daughter-in-law"
             },
             {
@@ -272,9 +272,9 @@ class FamilyTreeApp {
                 "relationship": "Granddaughter"
             },
             {
-                "id": "bandeshowri-athokpam",
-                "name": "Bandeshowri Athokpam",
-                "photo": "photos/bandeshowri.jpg",
+                "id": "bandeshwori-athokpam",
+                "name": "Bandeshwori Athokpam",
+                "photo": "photos/bandeshwori.jpg",
                 "generation": 2,
                 "parents": ["indu-athokpam", "ngambi-athokpam"],
                 "spouse": null,

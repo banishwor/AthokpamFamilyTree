@@ -40,7 +40,7 @@ Use **firstname.jpg** format (lowercase, no spaces)
 - `jobistra.jpg` - Jobistra Athokpam (1st)
 - `romita.jpg` - Romita Athokpam (Jobistra's wife)
 - `bandana.jpg` - Bandana Athokpam (2nd)
-- `bandeshowri.jpg` - Bandeshowri Athokpam (3rd)
+- `bandeshwori.jpg` - Bandeshwori Athokpam (3rd)
 - `reteshwori.jpg` - Reteshwori Athokpam (4th)
 
 **Inao & Bino's Children:**
