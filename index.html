@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Tree App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container flex justify-between items-center py-16">
+            <h1 class="text-3xl font-bold text-primary">Family Tree</h1>
+            <nav class="flex items-center gap-16">
+                <a href="#family-tree" class="btn btn--primary">View Tree</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Family Tree View -->
+        <div id="familyTreeView" class="container py-32">
+            <div class="text-center mb-32">
+                <h2 class="text-2xl font-semibold mb-8">Our Family Tree</h2>
+                <p class="text-gray-600">Click on any family member to view their profile</p>
+            </div>
+            
+            <!-- Family Tree Container -->
+            <div id="familyTree" class="family-tree-container">
+                <svg id="familyTreeSvg" class="family-tree-svg"></svg>
+            </div>
+        </div>
+    </main>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="profileModalTitle" class="text-xl font-semibold">Profile</h3>
+                <button id="closeProfileModal" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="profile-photo-large mb-16">
+                    <div id="profileModalPhoto" class="profile-photo-large-img"></div>
+                </div>
+                <h4 id="profileModalName" class="text-lg font-semibold mb-8"></h4>
+                <p id="profileModalRelationship" class="text-gray-600 mb-8"></p>
+                <div id="profileModalDetails" class="text-sm text-gray-500">
+                    <!-- Additional details will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
