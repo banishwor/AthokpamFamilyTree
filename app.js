@@ -440,6 +440,66 @@ class FamilyTreeApp {
                 this.hideAllModals();
             }
         });
+
+        // Mobile navigation events
+        this.bindMobileNavigationEvents();
+        
+        // Mobile-specific events
+        this.bindMobileSpecificEvents();
+    }
+
+    bindMobileNavigationEvents() {
+        const navToggle = document.getElementById('mobileNavToggle');
+        const navContent = document.getElementById('mobileNavContent');
+        const navClose = document.getElementById('mobileNavClose');
+
+        if (navToggle && navContent && navClose) {
+            navToggle.addEventListener('click', () => {
+                navToggle.classList.toggle('active');
+                navContent.classList.toggle('active');
+            });
+
+            navClose.addEventListener('click', () => {
+                navToggle.classList.remove('active');
+                navContent.classList.remove('active');
+            });
+
+            // Close nav when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!navToggle.contains(e.target) && !navContent.contains(e.target)) {
+                    navToggle.classList.remove('active');
+                    navContent.classList.remove('active');
+                }
+            });
+        }
+    }
+
+    bindMobileSpecificEvents() {
+        // Hide instructions after 5 seconds on mobile
+        if (window.innerWidth <= 768) {
+            setTimeout(() => {
+                const instructions = document.getElementById('zoomInstructions');
+                if (instructions) {
+                    instructions.style.opacity = '0.7';
+                    setTimeout(() => {
+                        instructions.style.opacity = '0.3';
+                    }, 2000);
+                }
+            }, 5000);
+        }
+
+        // Add touch feedback to family nodes
+        document.addEventListener('touchstart', (e) => {
+            if (e.target.closest('.family-node')) {
+                e.target.closest('.family-node').classList.add('touching');
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchend', (e) => {
+            if (e.target.closest('.family-node')) {
+                e.target.closest('.family-node').classList.remove('touching');
+            }
+        }, { passive: true });
     }
 
     // 1) Identify couples (spouse pairs) and index persons
@@ -832,7 +892,7 @@ class FamilyTreeApp {
                 
                 if (initialDistance > 0) {
                     const scale = currentDistance / initialDistance;
-                    const zoom = 1 / scale;
+                    const zoom = scale; // Fixed: removed the 1/scale inversion
                     
                     // Calculate center point between the two touches
                     const centerX = (touch1.clientX + touch2.clientX) / 2;
@@ -847,10 +907,10 @@ class FamilyTreeApp {
                     const point = svgPoint.matrixTransform(ctm);
                     
                     // Calculate new viewBox
-                    const newWidth = initialViewBox.width * scale;
-                    const newHeight = initialViewBox.height * scale;
-                    const newX = point.x - (point.x - initialViewBox.x) * scale;
-                    const newY = point.y - (point.y - initialViewBox.y) * scale;
+                    const newWidth = initialViewBox.width / scale; // Fixed: divide by scale to zoom in when scale increases
+                    const newHeight = initialViewBox.height / scale; // Fixed: divide by scale to zoom in when scale increases
+                    const newX = point.x - (point.x - initialViewBox.x) / scale; // Fixed: divide by scale
+                    const newY = point.y - (point.y - initialViewBox.y) / scale; // Fixed: divide by scale
                     
                     viewBox = { x: newX, y: newY, width: newWidth, height: newHeight };
                     svg.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
@@ -1386,7 +1446,56 @@ class FamilyTreeApp {
 
         group.appendChild(text);
 
-        // Click handler
+        // Click and touch handlers for better mobile support
+        let touchStartTime = 0;
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let hasMoved = false;
+
+        // Touch start handler
+        group.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            touchStartTime = Date.now();
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            hasMoved = false;
+            
+            // Add visual feedback
+            group.classList.add('touching');
+        }, { passive: false });
+
+        // Touch move handler
+        group.addEventListener('touchmove', (e) => {
+            const touch = e.touches[0];
+            const deltaX = Math.abs(touch.clientX - touchStartX);
+            const deltaY = Math.abs(touch.clientY - touchStartY);
+            
+            // If moved more than 10px, consider it a pan gesture
+            if (deltaX > 10 || deltaY > 10) {
+                hasMoved = true;
+                group.classList.remove('touching');
+            }
+        }, { passive: true });
+
+        // Touch end handler
+        group.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const touchEndTime = Date.now();
+            const touchDuration = touchEndTime - touchStartTime;
+            
+            // Remove visual feedback
+            group.classList.remove('touching');
+            
+            // Only trigger if it's a short tap (less than 300ms) and didn't move much
+            if (touchDuration < 300 && !hasMoved) {
+                this.showPersonProfile(person);
+            }
+        }, { passive: false });
+
+        // Click handler for desktop
         group.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -1452,7 +1561,83 @@ class FamilyTreeApp {
         const svg = document.getElementById('familyTreeSvg');
         if (!svg) return;
         
-        svg.setAttribute('viewBox', '0 0 1800 1600');
+        svg.setAttribute('viewBox', '0 0 2400 2000');
+        this.updateDynamicSpacing(1);
+    }
+
+    // Navigate to specific generation
+    goToGeneration(generation) {
+        const svg = document.getElementById('familyTreeSvg');
+        if (!svg) return;
+        
+        // Calculate the Y position for the generation
+        const generationY = 150 + (generation * 220); // Based on layoutConfig.levelHeight
+        
+        // Set viewBox to focus on the generation
+        const viewBoxWidth = 2400;
+        const viewBoxHeight = 400; // Show one generation at a time
+        const viewBoxX = 0;
+        const viewBoxY = Math.max(0, generationY - 100); // Center the generation
+        
+        svg.setAttribute('viewBox', `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`);
+        this.updateDynamicSpacing(1);
+        
+        // Close mobile nav if open
+        const navToggle = document.getElementById('mobileNavToggle');
+        const navContent = document.getElementById('mobileNavContent');
+        if (navToggle && navContent) {
+            navToggle.classList.remove('active');
+            navContent.classList.remove('active');
+        }
+        
+        // Show feedback for mobile
+        if (window.innerWidth <= 768) {
+            this.showMobileFeedback(`Navigated to Generation ${generation}`);
+        }
+    }
+
+    // Show mobile feedback
+    showMobileFeedback(message) {
+        // Remove existing feedback
+        const existingFeedback = document.querySelector('.mobile-feedback');
+        if (existingFeedback) {
+            existingFeedback.remove();
+        }
+        
+        // Create feedback element
+        const feedback = document.createElement('div');
+        feedback.className = 'mobile-feedback';
+        feedback.textContent = message;
+        feedback.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            z-index: 1002;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        `;
+        
+        document.body.appendChild(feedback);
+        
+        // Animate in
+        setTimeout(() => {
+            feedback.style.opacity = '1';
+        }, 10);
+        
+        // Animate out after 2 seconds
+        setTimeout(() => {
+            feedback.style.opacity = '0';
+            setTimeout(() => {
+                feedback.remove();
+            }, 300);
+        }, 2000);
     }
 
     // Profile modal
@@ -1549,5 +1734,11 @@ function zoomOut() {
 function resetTreeView() {
     if (familyTreeApp) {
         familyTreeApp.resetView();
+    }
+}
+
+function goToGeneration(generation) {
+    if (familyTreeApp) {
+        familyTreeApp.goToGeneration(generation);
     }
 }

@@ -29,6 +29,43 @@
             
             <!-- Family Tree Container -->
             <div id="familyTree" class="family-tree-container">
+                <!-- Mobile Navigation Menu -->
+                <div class="mobile-nav-menu" id="mobileNavMenu">
+                    <button class="mobile-nav-toggle" id="mobileNavToggle">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                    <div class="mobile-nav-content" id="mobileNavContent">
+                        <div class="mobile-nav-header">
+                            <h3>Navigation</h3>
+                            <button class="mobile-nav-close" id="mobileNavClose">&times;</button>
+                        </div>
+                        <div class="mobile-nav-items">
+                            <button class="mobile-nav-item" onclick="goToGeneration(0)">
+                                <span class="nav-icon">👴👵</span>
+                                <span>Root Generation</span>
+                            </button>
+                            <button class="mobile-nav-item" onclick="goToGeneration(1)">
+                                <span class="nav-icon">👨👩</span>
+                                <span>1st Generation</span>
+                            </button>
+                            <button class="mobile-nav-item" onclick="goToGeneration(2)">
+                                <span class="nav-icon">👦👧</span>
+                                <span>2nd Generation</span>
+                            </button>
+                            <button class="mobile-nav-item" onclick="goToGeneration(3)">
+                                <span class="nav-icon">👶</span>
+                                <span>3rd Generation</span>
+                            </button>
+                            <button class="mobile-nav-item" onclick="resetTreeView()">
+                                <span class="nav-icon">🏠</span>
+                                <span>Reset View</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <button class="reset-view-btn" onclick="resetTreeView()">Reset View</button>
                 
                 <div class="zoom-controls">
@@ -36,8 +73,8 @@
                     <button class="zoom-btn" onclick="zoomOut()">−</button>
                 </div>
                 
-                <div class="zoom-instructions">
-                    🖱️ Scroll to zoom • 🖱️ Drag to pan • Click members for details
+                <div class="zoom-instructions" id="zoomInstructions">
+                    📱 Pinch to zoom • 👆 Drag to pan • 👆 Tap photos for details
                 </div>
                 
                 <svg id="familyTreeSvg" class="family-tree-svg"></svg>
