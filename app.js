@@ -719,6 +719,8 @@ class FamilyTreeApp {
         let startPoint = { x: 0, y: 0 };
         let endPoint = { x: 0, y: 0 };
         let viewBox = { x: 0, y: 0, width: 2400, height: 2000 };
+        let initialDistance = 0;
+        let initialViewBox = null;
 
         // Enhanced mouse wheel zoom with dynamic spacing
         svg.addEventListener('wheel', (e) => {
@@ -751,7 +753,7 @@ class FamilyTreeApp {
             this.updateDynamicSpacing(zoom);
         });
 
-        // Pan functionality
+        // Pan functionality (Mouse)
         svg.addEventListener('mousedown', (e) => {
             isPanning = true;
             startPoint = { x: e.clientX, y: e.clientY };
@@ -781,6 +783,98 @@ class FamilyTreeApp {
             isPanning = false;
             svg.style.cursor = 'grab';
         });
+
+        // Touch functionality for mobile devices
+        svg.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            
+            if (e.touches.length === 1) {
+                // Single touch - start panning
+                isPanning = true;
+                startPoint = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                initialViewBox = { ...viewBox };
+            } else if (e.touches.length === 2) {
+                // Two touches - prepare for pinch zoom
+                isPanning = false;
+                const touch1 = e.touches[0];
+                const touch2 = e.touches[1];
+                initialDistance = Math.sqrt(
+                    Math.pow(touch2.clientX - touch1.clientX, 2) + 
+                    Math.pow(touch2.clientY - touch1.clientY, 2)
+                );
+                initialViewBox = { ...viewBox };
+            }
+        }, { passive: false });
+
+        svg.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            
+            if (e.touches.length === 1 && isPanning) {
+                // Single touch panning
+                const touch = e.touches[0];
+                endPoint = { x: touch.clientX, y: touch.clientY };
+                const dx = (startPoint.x - endPoint.x) * viewBox.width / svg.clientWidth;
+                const dy = (startPoint.y - endPoint.y) * viewBox.height / svg.clientHeight;
+                
+                viewBox.x += dx;
+                viewBox.y += dy;
+                svg.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+                
+                startPoint = { x: endPoint.x, y: endPoint.y };
+            } else if (e.touches.length === 2 && initialViewBox) {
+                // Two touch pinch zoom
+                const touch1 = e.touches[0];
+                const touch2 = e.touches[1];
+                const currentDistance = Math.sqrt(
+                    Math.pow(touch2.clientX - touch1.clientX, 2) + 
+                    Math.pow(touch2.clientY - touch1.clientY, 2)
+                );
+                
+                if (initialDistance > 0) {
+                    const scale = currentDistance / initialDistance;
+                    const zoom = 1 / scale;
+                    
+                    // Calculate center point between the two touches
+                    const centerX = (touch1.clientX + touch2.clientX) / 2;
+                    const centerY = (touch1.clientY + touch2.clientY) / 2;
+                    
+                    // Convert to SVG coordinates
+                    const rect = svg.getBoundingClientRect();
+                    const svgPoint = svg.createSVGPoint();
+                    svgPoint.x = centerX - rect.left;
+                    svgPoint.y = centerY - rect.top;
+                    const ctm = svg.getScreenCTM().inverse();
+                    const point = svgPoint.matrixTransform(ctm);
+                    
+                    // Calculate new viewBox
+                    const newWidth = initialViewBox.width * scale;
+                    const newHeight = initialViewBox.height * scale;
+                    const newX = point.x - (point.x - initialViewBox.x) * scale;
+                    const newY = point.y - (point.y - initialViewBox.y) * scale;
+                    
+                    viewBox = { x: newX, y: newY, width: newWidth, height: newHeight };
+                    svg.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+                    
+                    // Update dynamic spacing based on zoom level
+                    this.updateDynamicSpacing(zoom);
+                }
+            }
+        }, { passive: false });
+
+        svg.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            isPanning = false;
+            initialDistance = 0;
+            initialViewBox = null;
+        }, { passive: false });
+
+        // Prevent default touch behaviors that might interfere
+        svg.addEventListener('touchcancel', (e) => {
+            e.preventDefault();
+            isPanning = false;
+            initialDistance = 0;
+            initialViewBox = null;
+        }, { passive: false });
 
         // Set initial cursor
         svg.style.cursor = 'grab';
