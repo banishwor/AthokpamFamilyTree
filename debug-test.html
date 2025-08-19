@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Family Tree</title>
+</head>
+<body>
+    <h1>Family Tree Debug</h1>
+    <div id="debug-info"></div>
+    
+    <script src="app.js"></script>
+    <script>
+        // Create app instance and check data
+        const app = new FamilyTreeApp();
+        const debugDiv = document.getElementById('debug-info');
+        
+        // Group family data by generation
+        const generations = {};
+        app.familyData.forEach(person => {
+            if (!generations[person.generation]) {
+                generations[person.generation] = [];
+            }
+            generations[person.generation].push(person);
+        });
+        
+        // Display generation info
+        let html = '<h2>Family Data by Generation:</h2>';
+        Object.keys(generations).forEach(gen => {
+            html += `<h3>Generation ${gen} (${generations[gen].length} members):</h3>`;
+            html += '<ul>';
+            generations[gen].forEach(person => {
+                html += `<li>${person.name} (ID: ${person.id}) - Parents: ${person.parents ? person.parents.join(', ') : 'None'}</li>`;
+            });
+            html += '</ul>';
+        });
+        
+        debugDiv.innerHTML = html;
+    </script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo System Test - Family Tree</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .photo-test {
+            display: inline-block;
+            margin: 10px;
+            text-align: center;
+            vertical-align: top;
+        }
+        .photo-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid #4a90e2;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #e3f2fd;
+            font-weight: bold;
+            color: #1976d2;
+            overflow: hidden;
+        }
+        .photo-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status.loaded {
+            background-color: #4caf50;
+            color: white;
+        }
+        .status.missing {
+            background-color: #f44336;
+            color: white;
+        }
+        .status.error {
+            background-color: #ff9800;
+            color: white;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .summary {
+            background-color: #e8f5e8;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>📸 Photo System Test</h1>
+        
+        <div class="summary">
+            <h3>Test Results Summary</h3>
+            <p><strong>Total Photos Expected:</strong> <span id="total-expected">0</span></p>
+            <p><strong>Photos Found:</strong> <span id="total-found">0</span></p>
+            <p><strong>Photos Missing:</strong> <span id="total-missing">0</span></p>
+        </div>
+
+        <div id="photo-tests">
+            <!-- Photo tests will be generated here -->
+        </div>
+    </div>
+
+    <script>
+        // Family member data with photo paths
+        const familyMembers = [
+            { name: "Shamu Athokpam", photo: "photos/shamu.jpg", id: "shamu" },
+            { name: "Mangolnganbi Athokpam", photo: "photos/mangolnganbi.jpg", id: "mangolnganbi" },
+            { name: "Sanahal Athokpam", photo: "photos/sanahal.jpg", id: "sanahal" },
+            { name: "Inao Athokpam", photo: "photos/inao.jpg", id: "inao" },
+            { name: "Indu Athokpam", photo: "photos/indu.jpg", id: "indu" },
+            { name: "Sarat Athokpam", photo: "photos/sarat.jpg", id: "sarat" },
+            { name: "Basanta Athokpam", photo: "photos/basanta.jpg", id: "basanta" },
+            { name: "Tamphasana Athokpam", photo: "photos/tamphasana.jpg", id: "tamphasana" },
+            { name: "Mema Athokpam", photo: "photos/mema.jpg", id: "mema" },
+            { name: "Bino Athokpam", photo: "photos/bino.jpg", id: "bino" },
+            { name: "Ngambi Athokpam", photo: "photos/ngambi.jpg", id: "ngambi" },
+            { name: "Dimen Athokpam", photo: "photos/dimen.jpg", id: "dimen" },
+            { name: "Anita Athokpam", photo: "photos/anita.jpg", id: "anita" },
+            { name: "Mithun Athokpam", photo: "photos/mithun.jpg", id: "mithun" },
+            { name: "Ranjita Athokpam", photo: "photos/ranjita.jpg", id: "ranjita" },
+            { name: "Luxmi Athokpam", photo: "photos/luxmi.jpg", id: "luxmi" },
+            { name: "Ibecha Athokpam", photo: "photos/ibecha.jpg", id: "ibecha" },
+            { name: "Jobistra Athokpam", photo: "photos/jobistra.jpg", id: "jobistra" },
+            { name: "Bandana Athokpam", photo: "photos/bandana.jpg", id: "bandana" },
+            { name: "Bandeshowri Athokpam", photo: "photos/bandeshowri.jpg", id: "bandeshowri" },
+            { name: "Reteshwori Athokpam", photo: "photos/reteshwori.jpg", id: "reteshwori" },
+            { name: "Chaoba Athokpam", photo: "photos/chaoba.jpg", id: "chaoba" },
+            { name: "Omita Athokpam", photo: "photos/omita.jpg", id: "omita" },
+            { name: "Itombi Athokpam", photo: "photos/itombi.jpg", id: "itombi" },
+            { name: "Naobi Athokpam", photo: "photos/naobi.jpg", id: "naobi" },
+            { name: "Gojendro Athokpam", photo: "photos/gojendro.jpg", id: "gojendro" },
+            { name: "Johnson Athokpam", photo: "photos/johnson.jpg", id: "johnson" },
+            { name: "Joykumar Athokpam", photo: "photos/joykumar.jpg", id: "joykumar" },
+            { name: "Joymati Athokpam", photo: "photos/joymati.jpg", id: "joymati" },
+            { name: "Banikanta Athokpam", photo: "photos/banikanta.jpg", id: "banikanta" },
+            { name: "Banishwor Athokpam", photo: "photos/banishwor.jpg", id: "banishwor" },
+            { name: "Bishwal Athokpam", photo: "photos/bishwal.jpg", id: "bishwal" }
+        ];
+
+        let loadedCount = 0;
+        let missingCount = 0;
+
+        function getInitials(name) {
+            return name.split(' ').map(n => n[0]).join('').toUpperCase();
+        }
+
+        function testPhoto(member) {
+            const container = document.getElementById('photo-tests');
+            const photoDiv = document.createElement('div');
+            photoDiv.className = 'photo-test';
+            
+            const circleDiv = document.createElement('div');
+            circleDiv.className = 'photo-circle';
+            
+            const img = document.createElement('img');
+            img.src = member.photo;
+            img.alt = member.name;
+            
+            const statusDiv = document.createElement('div');
+            statusDiv.className = 'status';
+            
+            const nameDiv = document.createElement('div');
+            nameDiv.textContent = member.name;
+            nameDiv.style.fontSize = '12px';
+            nameDiv.style.marginTop = '5px';
+            
+            // Test if image loads
+            img.onload = function() {
+                statusDiv.textContent = '✓ Loaded';
+                statusDiv.className = 'status loaded';
+                loadedCount++;
+                updateSummary();
+            };
+            
+            img.onerror = function() {
+                circleDiv.innerHTML = getInitials(member.name);
+                statusDiv.textContent = '✗ Missing';
+                statusDiv.className = 'status missing';
+                missingCount++;
+                updateSummary();
+            };
+            
+            circleDiv.appendChild(img);
+            photoDiv.appendChild(circleDiv);
+            photoDiv.appendChild(statusDiv);
+            photoDiv.appendChild(nameDiv);
+            container.appendChild(photoDiv);
+        }
+
+        function updateSummary() {
+            document.getElementById('total-expected').textContent = familyMembers.length;
+            document.getElementById('total-found').textContent = loadedCount;
+            document.getElementById('total-missing').textContent = missingCount;
+        }
+
+        // Test all photos
+        familyMembers.forEach(testPhoto);
+    </script>
+</body>
+</html>

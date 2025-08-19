@@ -31,12 +31,14 @@ Use **firstname.jpg** format (lowercase, no spaces)
 
 **Sanahal & Mema's Children:**
 - `mithun.jpg` - Mithun Athokpam (1st)
+- `anjali.jpg` - Anjali Athokpam (Mithun's wife)
 - `ranjita.jpg` - Ranjita Athokpam (2nd)
 - `luxmi.jpg` - Luxmi Athokpam (3rd)
 - `ibecha.jpg` - Ibecha Athokpam (4th)
 
 **Indu & Ngambi's Children:**
 - `jobistra.jpg` - Jobistra Athokpam (1st)
+- `romita.jpg` - Romita Athokpam (Jobistra's wife)
 - `bandana.jpg` - Bandana Athokpam (2nd)
 - `bandeshowri.jpg` - Bandeshowri Athokpam (3rd)
 - `reteshwori.jpg` - Reteshwori Athokpam (4th)
@@ -47,6 +49,7 @@ Use **firstname.jpg** format (lowercase, no spaces)
 - `itombi.jpg` - Itombi Athokpam (3rd)
 - `naobi.jpg` - Naobi Athokpam (4th)
 - `gojendro.jpg` - Gojendro Athokpam (5th)
+- `promila.jpg` - Promila Athokpam (Gojendro's wife)
 
 **Sarat & Dimen's Children:**
 - `johnson.jpg` - Johnson Athokpam (1st)
@@ -57,6 +60,14 @@ Use **firstname.jpg** format (lowercase, no spaces)
 - `banikanta.jpg` - Banikanta Athokpam (1st)
 - `banishwor.jpg` - Banishwor Athokpam (2nd)
 - `bishwal.jpg` - Bishwal Athokpam (3rd)
+
+### Generation 3 (Great-grandchildren)
+
+**Jobistra & Romita's Children:**
+- `lamjingbi.jpg` - Lamjingbi Athokpam (daughter)
+
+**Gojendro & Promila's Children:**
+- `abungo.jpg` - Abungo Athokpam (son)
 
 ## 📝 Instructions
 

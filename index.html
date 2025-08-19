@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Family Tree App</title>
+    <title>Shamu Athokpam's Family Tree</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -11,7 +11,7 @@
     <!-- Header -->
     <header class="header">
         <div class="container flex justify-between items-center py-16">
-            <h1 class="text-3xl font-bold text-primary">Family Tree</h1>
+            <h1 class="text-3xl font-bold text-primary">Shamu Athokpam's Family Tree</h1>
             <nav class="flex items-center gap-16">
                 <a href="#family-tree" class="btn btn--primary">View Tree</a>
             </nav>
@@ -23,12 +23,23 @@
         <!-- Family Tree View -->
         <div id="familyTreeView" class="container py-32">
             <div class="text-center mb-32">
-                <h2 class="text-2xl font-semibold mb-8">Our Family Tree</h2>
+                <h2 class="text-2xl font-semibold mb-8">Shamu Athokpam's Family Tree</h2>
                 <p class="text-gray-600">Click on any family member to view their profile</p>
             </div>
             
             <!-- Family Tree Container -->
             <div id="familyTree" class="family-tree-container">
+                <button class="reset-view-btn" onclick="resetTreeView()">Reset View</button>
+                
+                <div class="zoom-controls">
+                    <button class="zoom-btn" onclick="zoomIn()">+</button>
+                    <button class="zoom-btn" onclick="zoomOut()">−</button>
+                </div>
+                
+                <div class="zoom-instructions">
+                    🖱️ Scroll to zoom • 🖱️ Drag to pan • Click members for details
+                </div>
+                
                 <svg id="familyTreeSvg" class="family-tree-svg"></svg>
             </div>
         </div>
@@ -56,5 +67,17 @@
     </div>
 
     <script src="app.js"></script>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container text-center py-16">
+            <p class="text-gray-600">
+                Developed and Maintained by 
+                <a href="https://banishwor.github.io/AboutMe/" target="_blank" class="text-primary hover:text-primary-dark font-semibold transition-colors">
+                    Banishwor Athokpam
+                </a>
+            </p>
+        </div>
+    </footer>
 </body>
 </html>

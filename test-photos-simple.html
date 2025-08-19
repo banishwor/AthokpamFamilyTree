@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Photo Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .photo-test {
+            display: inline-block;
+            margin: 10px;
+            text-align: center;
+        }
+        .photo-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid #4a90e2;
+            margin: 0 auto 10px;
+            overflow: hidden;
+            background-color: #e3f2fd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #1976d2;
+        }
+        .photo-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .status.success {
+            background-color: #4caf50;
+            color: white;
+        }
+        .status.error {
+            background-color: #f44336;
+            color: white;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>📸 Simple Photo Test</h1>
+        
+        <h3>Available Photos:</h3>
+        <div id="photo-tests">
+            <!-- Photo tests will be generated here -->
+        </div>
+        
+        <h3>Expected Photos (Missing):</h3>
+        <div id="missing-photos">
+            <!-- Missing photos will be listed here -->
+        </div>
+    </div>
+
+    <script>
+        // Available photos
+        const availablePhotos = [
+            { name: "Bishwal Athokpam", photo: "photos/bishwal.jpg" },
+            { name: "Banishwor Athokpam", photo: "photos/banishwor.jpg" }
+        ];
+
+        // Expected photos (from family tree)
+        const expectedPhotos = [
+            "photos/shamu.jpg",
+            "photos/mangolnganbi.jpg",
+            "photos/sanahal.jpg",
+            "photos/inao.jpg",
+            "photos/indu.jpg",
+            "photos/sarat.jpg",
+            "photos/basanta.jpg",
+            "photos/tamphasana.jpg",
+            "photos/mema.jpg",
+            "photos/bino.jpg",
+            "photos/ngambi.jpg",
+            "photos/dimen.jpg",
+            "photos/anita.jpg",
+            "photos/mithun.jpg",
+            "photos/ranjita.jpg",
+            "photos/luxmi.jpg",
+            "photos/ibecha.jpg",
+            "photos/jobistra.jpg",
+            "photos/bandana.jpg",
+            "photos/bandeshowri.jpg",
+            "photos/reteshwori.jpg",
+            "photos/chaoba.jpg",
+            "photos/omita.jpg",
+            "photos/itombi.jpg",
+            "photos/naobi.jpg",
+            "photos/gojendro.jpg",
+            "photos/johnson.jpg",
+            "photos/joykumar.jpg",
+            "photos/joymati.jpg",
+            "photos/banikanta.jpg",
+            "photos/banishwor.jpg",
+            "photos/bishwal.jpg"
+        ];
+
+        function getInitials(name) {
+            return name.split(' ').map(n => n[0]).join('').toUpperCase();
+        }
+
+        function testPhoto(member) {
+            const container = document.getElementById('photo-tests');
+            const photoDiv = document.createElement('div');
+            photoDiv.className = 'photo-test';
+            
+            const circleDiv = document.createElement('div');
+            circleDiv.className = 'photo-circle';
+            
+            const img = document.createElement('img');
+            img.src = member.photo;
+            img.alt = member.name;
+            
+            const statusDiv = document.createElement('div');
+            statusDiv.className = 'status';
+            
+            const nameDiv = document.createElement('div');
+            nameDiv.textContent = member.name;
+            nameDiv.style.fontSize = '12px';
+            
+            img.onload = function() {
+                statusDiv.textContent = '✓ Loaded Successfully';
+                statusDiv.className = 'status success';
+            };
+            
+            img.onerror = function() {
+                circleDiv.innerHTML = getInitials(member.name);
+                statusDiv.textContent = '✗ Failed to Load';
+                statusDiv.className = 'status error';
+            };
+            
+            circleDiv.appendChild(img);
+            photoDiv.appendChild(circleDiv);
+            photoDiv.appendChild(statusDiv);
+            photoDiv.appendChild(nameDiv);
+            container.appendChild(photoDiv);
+        }
+
+        function listMissingPhotos() {
+            const container = document.getElementById('missing-photos');
+            const availablePaths = availablePhotos.map(p => p.photo);
+            
+            expectedPhotos.forEach(photoPath => {
+                if (!availablePaths.includes(photoPath)) {
+                    const missingDiv = document.createElement('div');
+                    missingDiv.style.padding = '5px';
+                    missingDiv.style.borderBottom = '1px solid #eee';
+                    missingDiv.textContent = `Missing: ${photoPath}`;
+                    container.appendChild(missingDiv);
+                }
+            });
+        }
+
+        // Test available photos
+        availablePhotos.forEach(testPhoto);
+        
+        // List missing photos
+        listMissingPhotos();
+    </script>
+</body>
+</html>
