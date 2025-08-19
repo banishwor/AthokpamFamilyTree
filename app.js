@@ -14,95 +14,338 @@ class FamilyTreeApp {
         this.renderFamilyTree();
     }
 
-    // Load sample family data
+    // Load Athokpam family data
     loadSampleData() {
         this.familyData = [
+            // Root Generation (Generation 0) - Parents
             {
-                "id": "john-doe",
-                "name": "John Doe", 
-                "photo": null,
+                "id": "shamu-athokpam",
+                "name": "Shamu Athokpam", 
+                "photo": "photos/shamu.jpg",
                 "generation": 0,
                 "parents": [],
-                "spouse": "jane-doe",
-                "children": ["mike-doe", "sarah-johnson"],
+                "spouse": "mangolnganbi-athokpam",
+                "children": ["sanahal-athokpam", "inao-athokpam", "indu-athokpam", "sarat-athokpam", "basanta-athokpam", "tamphasana-athokpam"],
                 "relationship": "Father"
             },
             {
-                "id": "jane-doe",
-                "name": "Jane Doe",
-                "photo": null, 
+                "id": "mangolnganbi-athokpam",
+                "name": "Mangolnganbi Athokpam",
+                "photo": "photos/mangolnganbi.jpg", 
                 "generation": 0,
                 "parents": [],
-                "spouse": "john-doe",
-                "children": ["mike-doe", "sarah-johnson"],
+                "spouse": "shamu-athokpam",
+                "children": ["sanahal-athokpam", "inao-athokpam", "indu-athokpam", "sarat-athokpam", "basanta-athokpam", "tamphasana-athokpam"],
                 "relationship": "Mother"
             },
+            
+            // First Generation (Generation 1) - Children in Birth Order
             {
-                "id": "mike-doe",
-                "name": "Mike Doe",
-                "photo": null,
+                "id": "sanahal-athokpam",
+                "name": "Sanahal Athokpam",
+                "photo": "photos/sanahal.jpg",
                 "generation": 1, 
-                "parents": ["john-doe", "jane-doe"],
-                "spouse": "lisa-doe",
-                "children": ["emma-doe", "jack-doe"],
-                "relationship": "Son"
+                "parents": ["shamu-athokpam", "mangolnganbi-athokpam"],
+                "spouse": "mema-athokpam",
+                "children": ["mithun-athokpam", "ranjita-athokpam", "luxmi-athokpam", "ibecha-athokpam"],
+                "relationship": "Son (1st)"
             },
             {
-                "id": "sarah-johnson", 
-                "name": "Sarah Johnson",
-                "photo": null,
+                "id": "inao-athokpam",
+                "name": "Inao Athokpam", 
+                "photo": "photos/inao.jpg",
                 "generation": 1,
-                "parents": ["john-doe", "jane-doe"], 
-                "spouse": "david-johnson",
-                "children": ["alex-johnson"],
-                "relationship": "Daughter"
+                "parents": ["shamu-athokpam", "mangolnganbi-athokpam"],
+                "spouse": "bino-athokpam", 
+                "children": ["chaoba-athokpam", "omita-athokpam", "itombi-athokpam", "naobi-athokpam", "gojendro-athokpam"],
+                "relationship": "Son (2nd)"
             },
             {
-                "id": "lisa-doe",
-                "name": "Lisa Doe", 
-                "photo": null,
+                "id": "indu-athokpam", 
+                "name": "Indu Athokpam",
+                "photo": "photos/indu.jpg",
+                "generation": 1,
+                "parents": ["shamu-athokpam", "mangolnganbi-athokpam"], 
+                "spouse": "ngambi-athokpam",
+                "children": ["jobistra-athokpam", "bandana-athokpam", "bandeshowri-athokpam", "reteshwori-athokpam"],
+                "relationship": "Son (3rd)"
+            },
+            {
+                "id": "sarat-athokpam",
+                "name": "Sarat Athokpam",
+                "photo": "photos/sarat.jpg",
+                "generation": 1, 
+                "parents": ["shamu-athokpam", "mangolnganbi-athokpam"],
+                "spouse": "dimen-athokpam",
+                "children": ["johnson-athokpam", "joykumar-athokpam", "joymati-athokpam"],
+                "relationship": "Son (4th)"
+            },
+            {
+                "id": "basanta-athokpam", 
+                "name": "Basanta Athokpam",
+                "photo": "photos/basanta.jpg",
+                "generation": 1,
+                "parents": ["shamu-athokpam", "mangolnganbi-athokpam"], 
+                "spouse": "anita-athokpam",
+                "children": ["banikanta-athokpam", "banishwor-athokpam", "bishwal-athokpam"],
+                "relationship": "Son (6th)"
+            },
+            {
+                "id": "tamphasana-athokpam",
+                "name": "Tamphasana Athokpam",
+                "photo": "photos/tamphasana.jpg",
+                "generation": 1,
+                "parents": ["shamu-athokpam", "mangolnganbi-athokpam"],
+                "spouse": null,
+                "children": [],
+                "relationship": "Daughter (5th) - Married to different surname"
+            },
+
+            // Second Generation (Generation 2) - Sanahal's Family
+            {
+                "id": "mema-athokpam",
+                "name": "Mema Athokpam",
+                "photo": "photos/mema.jpg",
                 "generation": 1,
                 "parents": [],
-                "spouse": "mike-doe", 
-                "children": ["emma-doe", "jack-doe"],
+                "spouse": "sanahal-athokpam",
+                "children": ["mithun-athokpam", "ranjita-athokpam", "luxmi-athokpam", "ibecha-athokpam"],
                 "relationship": "Daughter-in-law"
             },
             {
-                "id": "david-johnson",
-                "name": "David Johnson",
-                "photo": null,
-                "generation": 1, 
-                "parents": [],
-                "spouse": "sarah-johnson",
-                "children": ["alex-johnson"], 
-                "relationship": "Son-in-law"
-            },
-            {
-                "id": "emma-doe",
-                "name": "Emma Doe", 
-                "photo": null,
+                "id": "mithun-athokpam",
+                "name": "Mithun Athokpam",
+                "photo": "photos/mithun.jpg",
                 "generation": 2,
-                "parents": ["mike-doe", "lisa-doe"],
+                "parents": ["sanahal-athokpam", "mema-athokpam"],
                 "spouse": null,
                 "children": [],
-                "relationship": "Granddaughter"
+                "relationship": "Grandson (1st)"
             },
             {
-                "id": "jack-doe", 
-                "name": "Jack Doe",
-                "photo": null,
+                "id": "ranjita-athokpam",
+                "name": "Ranjita Athokpam",
+                "photo": "photos/ranjita.jpg",
                 "generation": 2,
-                "parents": ["mike-doe", "lisa-doe"],
+                "parents": ["sanahal-athokpam", "mema-athokpam"],
+                "spouse": null,
+                "children": [],
+                "relationship": "Granddaughter (2nd)"
+            },
+            {
+                "id": "luxmi-athokpam",
+                "name": "Luxmi Athokpam",
+                "photo": "photos/luxmi.jpg",
+                "generation": 2,
+                "parents": ["sanahal-athokpam", "mema-athokpam"],
+                "spouse": null,
+                "children": [],
+                "relationship": "Granddaughter (3rd)"
+            },
+            {
+                "id": "ibecha-athokpam",
+                "name": "Ibecha Athokpam",
+                "photo": "photos/ibecha.jpg",
+                "generation": 2,
+                "parents": ["sanahal-athokpam", "mema-athokpam"],
+                "spouse": null,
+                "children": [],
+                "relationship": "Granddaughter (4th)"
+            },
+
+            // Second Generation (Generation 2) - Indu's Family
+            {
+                "id": "ngambi-athokpam",
+                "name": "Ngambi Athokpam",
+                "photo": "photos/ngambi.jpg",
+                "generation": 1,
+                "parents": [],
+                "spouse": "indu-athokpam",
+                "children": ["jobistra-athokpam", "bandana-athokpam", "bandeshowri-athokpam", "reteshwori-athokpam"],
+                "relationship": "Daughter-in-law"
+            },
+            {
+                "id": "jobistra-athokpam",
+                "name": "Jobistra Athokpam",
+                "photo": "photos/jobistra.jpg",
+                "generation": 2,
+                "parents": ["indu-athokpam", "ngambi-athokpam"],
                 "spouse": null,
                 "children": [],
                 "relationship": "Grandson"
             },
             {
-                "id": "alex-johnson",
-                "name": "Alex Johnson",
-                "photo": null,
+                "id": "bandana-athokpam",
+                "name": "Bandana Athokpam",
+                "photo": "photos/bandana.jpg",
                 "generation": 2,
-                "parents": ["sarah-johnson", "david-johnson"],
+                "parents": ["indu-athokpam", "ngambi-athokpam"],
+                "spouse": null,
+                "children": [],
+                "relationship": "Granddaughter"
+            },
+            {
+                "id": "bandeshowri-athokpam",
+                "name": "Bandeshowri Athokpam",
+                "photo": "photos/bandeshowri.jpg",
+                "generation": 2,
+                "parents": ["indu-athokpam", "ngambi-athokpam"],
+                "spouse": null,
+                "children": [],
+                "relationship": "Granddaughter"
+            },
+            {
+                "id": "reteshwori-athokpam",
+                "name": "Reteshwori Athokpam",
+                "photo": "photos/reteshwori.jpg",
+                "generation": 2,
+                "parents": ["indu-athokpam", "ngambi-athokpam"],
+                "spouse": null,
+                "children": [],
+                "relationship": "Granddaughter"
+            },
+
+            // Second Generation (Generation 2) - Inao's Family
+            {
+                "id": "bino-athokpam",
+                "name": "Bino Athokpam",
+                "photo": "photos/bino.jpg",
+                "generation": 1,
+                "parents": [],
+                "spouse": "inao-athokpam",
+                "children": ["chaoba-athokpam", "omita-athokpam", "itombi-athokpam", "naobi-athokpam", "gojendro-athokpam"],
+                "relationship": "Daughter-in-law"
+            },
+            {
+                "id": "chaoba-athokpam",
+                "name": "Chaoba Athokpam",
+                "photo": "photos/chaoba.jpg",
+                "generation": 2,
+                "parents": ["inao-athokpam", "bino-athokpam"],
+                "spouse": null,
+                "children": [],
+                "relationship": "Granddaughter"
+            },
+            {
+                "id": "omita-athokpam",
+                "name": "Omita Athokpam",
+                "photo": "photos/omita.jpg",
+                "generation": 2,
+                "parents": ["inao-athokpam", "bino-athokpam"],
+                "spouse": null,
+                "children": [],
+                "relationship": "Granddaughter"
+            },
+            {
+                "id": "itombi-athokpam",
+                "name": "Itombi Athokpam",
+                "photo": "photos/itombi.jpg",
+                "generation": 2,
+                "parents": ["inao-athokpam", "bino-athokpam"],
+                "spouse": null,
+                "children": [],
+                "relationship": "Granddaughter"
+            },
+            {
+                "id": "naobi-athokpam",
+                "name": "Naobi Athokpam",
+                "photo": "photos/naobi.jpg",
+                "generation": 2,
+                "parents": ["inao-athokpam", "bino-athokpam"],
+                "spouse": null,
+                "children": [],
+                "relationship": "Granddaughter"
+            },
+            {
+                "id": "gojendro-athokpam",
+                "name": "Gojendro Athokpam",
+                "photo": "photos/gojendro.jpg",
+                "generation": 2,
+                "parents": ["inao-athokpam", "bino-athokpam"],
+                "spouse": null,
+                "children": [],
+                "relationship": "Grandson"
+            },
+
+            // Second Generation (Generation 2) - Sarat's Family
+            {
+                "id": "dimen-athokpam",
+                "name": "Dimen Athokpam",
+                "photo": "photos/dimen.jpg",
+                "generation": 1,
+                "parents": [],
+                "spouse": "sarat-athokpam",
+                "children": ["johnson-athokpam", "joykumar-athokpam", "joymati-athokpam"],
+                "relationship": "Daughter-in-law"
+            },
+            {
+                "id": "johnson-athokpam",
+                "name": "Johnson Athokpam",
+                "photo": "photos/johnson.jpg",
+                "generation": 2,
+                "parents": ["sarat-athokpam", "dimen-athokpam"],
+                "spouse": null,
+                "children": [],
+                "relationship": "Grandson"
+            },
+            {
+                "id": "joykumar-athokpam",
+                "name": "Joykumar Athokpam",
+                "photo": "photos/joykumar.jpg",
+                "generation": 2,
+                "parents": ["sarat-athokpam", "dimen-athokpam"],
+                "spouse": null,
+                "children": [],
+                "relationship": "Grandson"
+            },
+            {
+                "id": "joymati-athokpam",
+                "name": "Joymati Athokpam",
+                "photo": "photos/joymati.jpg",
+                "generation": 2,
+                "parents": ["sarat-athokpam", "dimen-athokpam"],
+                "spouse": null,
+                "children": [],
+                "relationship": "Granddaughter"
+            },
+
+            // Second Generation (Generation 2) - Basanta's Family
+            {
+                "id": "anita-athokpam",
+                "name": "Anita Athokpam",
+                "photo": "photos/anita.jpg",
+                "generation": 1,
+                "parents": [],
+                "spouse": "basanta-athokpam",
+                "children": ["banikanta-athokpam", "banishwor-athokpam", "bishwal-athokpam"],
+                "relationship": "Daughter-in-law"
+            },
+            {
+                "id": "banikanta-athokpam",
+                "name": "Banikanta Athokpam",
+                "photo": "photos/banikanta.jpg",
+                "generation": 2,
+                "parents": ["basanta-athokpam", "anita-athokpam"],
+                "spouse": null,
+                "children": [],
+                "relationship": "Grandson"
+            },
+            {
+                "id": "banishwor-athokpam",
+                "name": "Banishwor Athokpam",
+                "photo": "photos/banishwor.jpg",
+                "generation": 2,
+                "parents": ["basanta-athokpam", "anita-athokpam"],
+                "spouse": null,
+                "children": [],
+                "relationship": "Grandson"
+            },
+            {
+                "id": "bishwal-athokpam",
+                "name": "Bishwal Athokpam",
+                "photo": "photos/bishwal.jpg",
+                "generation": 2,
+                "parents": ["basanta-athokpam", "anita-athokpam"],
                 "spouse": null,
                 "children": [],
                 "relationship": "Grandson"
