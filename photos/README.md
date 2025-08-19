@@ -14,7 +14,7 @@ Use **firstname.jpg** format (lowercase, no spaces)
 
 ### Generation 1 (Children)
 - `sanahal.jpg` - Sanahal Athokpam (1st Son)
-- `inao.jpg` - Inao Athokpam (2nd Son)
+- `radhamani.jpg` - Radhamani Athokpam (2nd Son)
 - `indu.jpg` - Indu Athokpam (3rd Son)
 - `sarat.jpg` - Sarat Athokpam (4th Son)
 - `basanta.jpg` - Basanta Athokpam (6th Son)
@@ -46,8 +46,8 @@ Use **firstname.jpg** format (lowercase, no spaces)
 **Inao & Bino's Children:**
 - `chaoba.jpg` - Chaoba Athokpam (1st)
 - `omita.jpg` - Omita Athokpam (2nd)
-- `itombi.jpg` - Itombi Athokpam (3rd)
-- `naobi.jpg` - Naobi Athokpam (4th)
+- `omila.jpg` - Omila Athokpam (3rd)
+- `ashalata.jpg` - Ashalata Athokpam (4th)
 - `gojendro.jpg` - Gojendro Athokpam (5th)
 - `promila.jpg` - Promila Athokpam (Gojendro's wife)
 
@@ -67,7 +67,7 @@ Use **firstname.jpg** format (lowercase, no spaces)
 - `lamjingbi.jpg` - Lamjingbi Athokpam (daughter)
 
 **Gojendro & Promila's Children:**
-- `abungo.jpg` - Abungo Athokpam (son)
+- `athoiba.jpg` - Athoiba Athokpam (son)
 
 ## 📝 Instructions
 

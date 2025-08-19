@@ -20,7 +20,7 @@ An interactive, zoomable family genealogy viewer showcasing the complete Athokpa
 ### Generation 1 (Children)
 - **Sanahal Athokpam** + **Mema Athokpam**
 - **Indu Athokpam** + **Ngambi Athokpam**
-- **Inao Athokpam** + **Bino Athokpam**
+- **Radhamani Athokpam** + **Bino Athokpam**
 - **Sarat Athokpam** + **Dimen Athokpam**
 - **Basanta Athokpam** + **Anita Athokpam**
 - **Tamphasana Athokpam** (married to other surname)
@@ -33,7 +33,7 @@ An interactive, zoomable family genealogy viewer showcasing the complete Athokpa
 
 ### Generation 3 (Great-Grandchildren)
 - **Lamjingbi Athokpam** (daughter of Jobistra & Romita)
-- **Abungo Athokpam** (son of Gojendro & Promila)
+- **Athoiba Athokpam** (son of Gojendro & Promila)
 
 ## 🚀 Live Demo
 

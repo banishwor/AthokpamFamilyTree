@@ -39,7 +39,7 @@ class FamilyTreeApp {
                 "generation": 0,
                 "parents": [],
                 "spouse": "mangolnganbi-athokpam",
-                "children": ["sanahal-athokpam", "inao-athokpam", "indu-athokpam", "sarat-athokpam", "basanta-athokpam", "tamphasana-athokpam"],
+                "children": ["sanahal-athokpam", "radhamani-athokpam", "indu-athokpam", "sarat-athokpam", "basanta-athokpam", "tamphasana-athokpam"],
                 "relationship": "Father"
             },
             {
@@ -49,7 +49,7 @@ class FamilyTreeApp {
                 "generation": 0,
                 "parents": [],
                 "spouse": "shamu-athokpam",
-                "children": ["sanahal-athokpam", "inao-athokpam", "indu-athokpam", "sarat-athokpam", "basanta-athokpam", "tamphasana-athokpam"],
+                "children": ["sanahal-athokpam", "radhamani-athokpam", "indu-athokpam", "sarat-athokpam", "basanta-athokpam", "tamphasana-athokpam"],
                 "relationship": "Mother"
             },
             
@@ -65,13 +65,13 @@ class FamilyTreeApp {
                 "relationship": "Son (1st)"
             },
             {
-                "id": "inao-athokpam",
-                "name": "Inao Athokpam", 
-                "photo": "photos/inao.jpg",
+                "id": "radhamani-athokpam",
+                "name": "Radhamani Athokpam", 
+                "photo": "photos/radhamani.jpg",
                 "generation": 1,
                 "parents": ["shamu-athokpam", "mangolnganbi-athokpam"],
                 "spouse": "bino-athokpam", 
-                "children": ["chaoba-athokpam", "omita-athokpam", "itombi-athokpam", "naobi-athokpam", "gojendro-athokpam"],
+                "children": ["chaoba-athokpam", "omita-athokpam", "omila-athokpam", "ashalata-athokpam", "gojendro-athokpam"],
                 "relationship": "Son (2nd)"
             },
             {
@@ -186,8 +186,8 @@ class FamilyTreeApp {
                 "photo": "photos/bino.jpg",
                 "generation": 1, 
                 "parents": [],
-                "spouse": "inao-athokpam",
-                "children": ["chaoba-athokpam", "omita-athokpam", "itombi-athokpam", "naobi-athokpam", "gojendro-athokpam"],
+                "spouse": "radhamani-athokpam",
+                "children": ["chaoba-athokpam", "omita-athokpam", "omila-athokpam", "ashalata-athokpam", "gojendro-athokpam"],
                 "relationship": "Daughter-in-law"
             },
             {
@@ -195,7 +195,7 @@ class FamilyTreeApp {
                 "name": "Chaoba Athokpam",
                 "photo": "photos/chaoba.jpg",
                 "generation": 2,
-                "parents": ["inao-athokpam", "bino-athokpam"],
+                "parents": ["radhamani-athokpam", "bino-athokpam"],
                 "spouse": null,
                 "children": [],
                 "relationship": "Granddaughter"
@@ -205,27 +205,27 @@ class FamilyTreeApp {
                 "name": "Omita Athokpam",
                 "photo": "photos/omita.jpg",
                 "generation": 2,
-                "parents": ["inao-athokpam", "bino-athokpam"],
+                "parents": ["radhamani-athokpam", "bino-athokpam"],
                 "spouse": null,
                 "children": [],
                 "relationship": "Granddaughter"
             },
             {
-                "id": "itombi-athokpam",
-                "name": "Itombi Athokpam",
-                "photo": "photos/itombi.jpg",
+                "id": "omila-athokpam",
+                "name": "Omila Athokpam",
+                "photo": "photos/omila.jpg",
                 "generation": 2,
-                "parents": ["inao-athokpam", "bino-athokpam"],
+                "parents": ["radhamani-athokpam", "bino-athokpam"],
                 "spouse": null,
                 "children": [],
                 "relationship": "Granddaughter"
             },
             {
-                "id": "naobi-athokpam",
-                "name": "Naobi Athokpam",
-                "photo": "photos/naobi.jpg",
+                "id": "ashalata-athokpam",
+                "name": "Ashalata Athokpam",
+                "photo": "photos/ashalata.jpg",
                 "generation": 2,
-                "parents": ["inao-athokpam", "bino-athokpam"],
+                "parents": ["radhamani-athokpam", "bino-athokpam"],
                 "spouse": null,
                 "children": [],
                 "relationship": "Granddaughter"
@@ -235,9 +235,9 @@ class FamilyTreeApp {
                 "name": "Gojendro Athokpam",
                 "photo": "photos/gojendro.jpg",
                 "generation": 2,
-                "parents": ["inao-athokpam", "bino-athokpam"],
+                "parents": ["radhamani-athokpam", "bino-athokpam"],
                 "spouse": "promila-athokpam",
-                "children": ["abungo-athokpam"],
+                "children": ["athoiba-athokpam"],
                 "relationship": "Grandson"
             },
             // Second Generation (Generation 2) - Indu's Family
@@ -308,7 +308,7 @@ class FamilyTreeApp {
                 "generation": 2,
                 "parents": [],
                 "spouse": "gojendro-athokpam",
-                "children": ["abungo-athokpam"],
+                "children": ["athoiba-athokpam"],
                 "relationship": "Daughter-in-law"
             },
             
@@ -408,9 +408,9 @@ class FamilyTreeApp {
                 "relationship": "Great-granddaughter"
             },
             {
-                "id": "abungo-athokpam",
-                "name": "Abungo Athokpam",
-                "photo": "photos/abungo.jpg",
+                "id": "athoiba-athokpam",
+                "name": "Athoiba Athokpam",
+                "photo": "photos/athoiba.jpg",
                 "generation": 3,
                 "parents": ["gojendro-athokpam", "promila-athokpam"],
                 "spouse": null,
