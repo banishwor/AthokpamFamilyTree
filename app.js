@@ -475,17 +475,20 @@ class FamilyTreeApp {
     }
 
     bindMobileSpecificEvents() {
-        // Hide instructions after 5 seconds on mobile
+        // Hide instructions after 3 seconds on mobile
         if (window.innerWidth <= 768) {
             setTimeout(() => {
                 const instructions = document.getElementById('zoomInstructions');
                 if (instructions) {
-                    instructions.style.opacity = '0.7';
+                    instructions.style.opacity = '0.5';
                     setTimeout(() => {
-                        instructions.style.opacity = '0.3';
+                        instructions.style.opacity = '0.2';
+                        setTimeout(() => {
+                            instructions.style.display = 'none';
+                        }, 1000);
                     }, 2000);
                 }
-            }, 5000);
+            }, 3000);
         }
 
         // Add touch feedback to family nodes
@@ -665,8 +668,13 @@ class FamilyTreeApp {
         if (!svg) return;
         svg.innerHTML = '';
 
-        // Canvas
-        const width = 2400, height = 2000;
+        // Canvas - mobile optimized
+        let width = 2400, height = 2000;
+        if (window.innerWidth <= 768) {
+            width = 1200;
+            height = 1000;
+        }
+        
         svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
         svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
 
@@ -1561,7 +1569,13 @@ class FamilyTreeApp {
         const svg = document.getElementById('familyTreeSvg');
         if (!svg) return;
         
-        svg.setAttribute('viewBox', '0 0 2400 2000');
+        // Mobile-optimized viewBox
+        if (window.innerWidth <= 768) {
+            // For mobile, show a more focused view
+            svg.setAttribute('viewBox', '0 0 1200 1000');
+        } else {
+            svg.setAttribute('viewBox', '0 0 2400 2000');
+        }
         this.updateDynamicSpacing(1);
     }
 
