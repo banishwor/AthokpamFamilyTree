@@ -3,6 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import { getDirectPhotoUrl } from '../utils';
 
+const isSafariOrIOS = typeof navigator !== 'undefined' && (
+  /Apple/.test(navigator.vendor) || 
+  /iPhone|iPad|iPod/.test(navigator.userAgent) || 
+  (navigator.maxTouchPoints > 1 && navigator.userAgent.includes('Macintosh'))
+);
+
 interface TreeNodeProps {
   nodeDatum: any;
   toggleNode: () => void;
@@ -92,6 +98,15 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode }) => 
     // Disable link if it is a virtual root or invalid ID
     const hasValidId = m.id && m.id !== 'undefined' && !String(m.id).startsWith('virtual');
 
+    // To resolve Safari/iOS rendering bug in SVG foreignObject, disable transitions and transforms
+    const transitionClass = isSafariOrIOS ? '' : 'transition-all duration-300 will-change-transform';
+    const hoverScaleClass = isSafariOrIOS || !hasValidId ? '' : 'hover:scale-105 hover:-translate-y-0.5';
+    const hoverBorderClass = isSafariOrIOS
+      ? ''
+      : (isFemaleCard
+          ? 'hover:border-pink-500 hover:shadow-[0_10px_20px_-3px_rgba(244,63,94,0.35),_0_4px_6px_-2px_rgba(244,63,94,0.2)]'
+          : 'hover:border-amber-500 hover:shadow-[0_10px_20px_-3px_rgba(197,160,89,0.35),_0_4px_6px_-2px_rgba(197,160,89,0.2)]');
+
     return (
       <div
         id={`tree-card-member-${m.id}`}
@@ -101,14 +116,14 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode }) => 
             navigate(`/member/${m.id}`);
           }
         }}
-        className={`w-[214px] h-[82px] p-2 bg-white dark:bg-zinc-850 border rounded-xl shadow-md flex items-center gap-2.5 text-left transition-all duration-300 will-change-transform ${
+        className={`w-[214px] h-[82px] p-2 bg-white dark:bg-zinc-850 border rounded-xl shadow-md flex items-center gap-2.5 text-left ${transitionClass} ${
           hasValidId
-            ? 'cursor-pointer group hover:scale-105 hover:-translate-y-0.5'
+            ? `cursor-pointer group ${hoverScaleClass}`
             : 'cursor-default'
         } ${
           isFemaleCard
-            ? 'border-pink-200 dark:border-pink-950/45 hover:border-pink-500 hover:shadow-[0_10px_20px_-3px_rgba(244,63,94,0.35),_0_4px_6px_-2px_rgba(244,63,94,0.2)]'
-            : 'border-amber-200/80 dark:border-white/5 hover:border-amber-500 hover:shadow-[0_10px_20px_-3px_rgba(197,160,89,0.35),_0_4px_6px_-2px_rgba(197,160,89,0.2)]'
+            ? `border-pink-200 dark:border-pink-950/45 ${hoverBorderClass}`
+            : `border-amber-200/80 dark:border-white/5 ${hoverBorderClass}`
         }`}
       >
         {/* Node Avatar */}

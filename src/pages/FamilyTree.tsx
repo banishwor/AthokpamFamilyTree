@@ -106,13 +106,6 @@ export const FamilyTree: React.FC = () => {
           </div>
         </div>
 
-        {/* Info Ribbon */}
-        <div id="tree-info-ribbon" className="bg-amber-50/80 dark:bg-amber-950/20 text-amber-800 dark:text-amber-400 border border-amber-100/50 dark:border-amber-900/20 px-4 py-2.5 rounded-xl text-xs flex items-start gap-2.5 mb-6 shadow-sm">
-          <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
-          <p className="leading-normal">
-            <strong>Tree Navigation Guider:</strong> Zoom by scrolling your mouse / pinching your trackpad. Drag/pan and click on any member's node card to view their complete biographical profile. Click node circular joints to expand or collapse sub-filiations!
-          </p>
-        </div>
 
         {/* Tree Canvas Wrapper */}
         <div
