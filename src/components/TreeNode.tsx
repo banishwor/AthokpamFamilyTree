@@ -222,7 +222,11 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode }) => 
 
             {/* Elegant Partnership Link Element with Intersecting Heart */}
             <div
-              className="flex-shrink-0 flex items-center justify-center w-5.5 h-5.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500/90 z-10 -mx-1 shadow-sm backdrop-blur-md animate-pulse hover:scale-120 duration-300 transition-transform cursor-pointer"
+              className={`flex-shrink-0 flex items-center justify-center w-5.5 h-5.5 rounded-full border text-amber-500/90 -mx-1 shadow-sm cursor-pointer ${
+                isSafariOrIOS
+                  ? 'bg-amber-50 dark:bg-zinc-800 border-amber-500/20'
+                  : 'bg-amber-500/10 border-amber-500/20 z-10 backdrop-blur-md animate-pulse hover:scale-120 duration-300 transition-transform'
+              }`}
               title="Spousal union"
             >
               <Heart className="w-3 h-3 fill-amber-500 text-amber-500" />
