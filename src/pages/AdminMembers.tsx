@@ -102,13 +102,17 @@ export const AdminMembers: React.FC = () => {
     setMotherId(member.motherId || '');
     setSpouseId(member.spouseId || '');
     
-    // Format dates to YYYY-MM-DD for standard html inputs
+    // Format dates to YYYY-MM-DD for standard html inputs, preventing timezone offset day shifts
     const formatDateInput = (dateStr?: string) => {
       if (!dateStr) return '';
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
       try {
         const d = new Date(dateStr);
         if (isNaN(d.getTime())) return '';
-        return d.toISOString().split('T')[0];
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
       } catch (err) {
         return '';
       }

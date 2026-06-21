@@ -85,10 +85,14 @@ export const QuickUpdate: React.FC = () => {
 
   const formatDateInput = (dateStr?: string) => {
     if (!dateStr) return '';
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
     try {
       const d = new Date(dateStr);
       if (isNaN(d.getTime())) return '';
-      return d.toISOString().split('T')[0];
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
     } catch (err) {
       return '';
     }
