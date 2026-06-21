@@ -127,7 +127,7 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode }) => 
         }`}
       >
         {/* Node Avatar */}
-        <div className="relative w-11 h-11 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50 dark:bg-zinc-800 flex items-center justify-center border border-gray-105 dark:border-white/5 shadow-inner">
+        <div className={`${isSafariOrIOS ? '' : 'relative'} w-11 h-11 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50 dark:bg-zinc-800 flex items-center justify-center border border-gray-105 dark:border-white/5 shadow-inner`}>
           {m.photoUrl ? (
             <img
               src={getDirectPhotoUrl(m.photoUrl)}
@@ -146,12 +146,14 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode }) => 
               {getInitials(m.firstName, m.lastName)}
             </div>
           )}
-          {/* Tiny gender dot */}
-          <div
-            className={`absolute bottom-0.5 right-0.5 w-2 h-2 rounded-full border border-white ${
-              isFemaleCard ? 'bg-pink-500' : 'bg-amber-650'
-            }`}
-          />
+          {/* Tiny gender dot (disabled on Safari/iOS to prevent positioning bug inside foreignObject) */}
+          {!isSafariOrIOS && (
+            <div
+              className={`absolute bottom-0.5 right-0.5 w-2 h-2 rounded-full border border-white ${
+                isFemaleCard ? 'bg-pink-500' : 'bg-amber-650'
+              }`}
+            />
+          )}
         </div>
 
         {/* Node Details */}
