@@ -1,0 +1,6 @@
+{
+  "name": "Athokpam Family Tree",
+  "description": "A comprehensive production-ready genealogy website and interactive family heritage platform for the Athokpam family.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

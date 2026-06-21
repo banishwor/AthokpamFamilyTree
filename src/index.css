@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@550;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-serif: Georgia, Cambria, "Times New Roman", Times, serif;
+
+  /* Sophisticated Dark Color Mappings */
+  --color-amber-50: #faf7f2;
+  --color-amber-100: #f4ecdc;
+  --color-amber-200: #e9dab7;
+  --color-amber-500: #d4ad64;
+  --color-amber-600: #c5a059;
+  --color-amber-700: #ae8b47;
+  --color-amber-800: #937336;
+  --color-amber-900: #785d2b;
+  --color-amber-950: #29210e;
+
+  --color-zinc-950: #0a0b0d;
+  --color-zinc-900: #0d0e12;
+  --color-zinc-850: #16181d;
+  --color-zinc-800: #20222a;
+}
+
+/* Custom background grid pattern inspired by Sophisticated Dark */
+.sophisticated-grid-bg {
+  position: relative;
+}
+.sophisticated-grid-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.15;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.4) 0.5px, transparent 0.5px);
+  background-size: 24px 24px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Family brand fonts */
+.font-serif-heritage {
+  font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+}
+
+/* Customized utility styles and keyframe entries */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes zoomIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1.0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-zoom-in {
+  animation: zoomIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Custom Tree Link styles */
+.rd3t-link {
+  stroke: #c5a059 !important;
+  stroke-width: 2px !important;
+  opacity: 0.8 !important;
+}
+
+/* Custom Scrollbar for modern touch */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 99px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #20222a;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Custom selections styling */
+::selection {
+  background-color: #c5a059;
+  color: #0a0b0d;
+}
