@@ -83,11 +83,22 @@ export const QuickUpdate: React.FC = () => {
     }
   };
 
+  const formatDateInput = (dateStr?: string) => {
+    if (!dateStr) return '';
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return '';
+      return d.toISOString().split('T')[0];
+    } catch (err) {
+      return '';
+    }
+  };
+
   const handleMemberSelect = (member: Member) => {
     setSelectedMember(member);
     setFirstName(member.firstName || '');
     setLastName(member.lastName || '');
-    setBirthDate(member.birthDate || '');
+    setBirthDate(formatDateInput(member.birthDate));
     
     // Clear photo upload cache
     setSelectedFile(null);
@@ -403,13 +414,11 @@ export const QuickUpdate: React.FC = () => {
                       Date of Birth
                     </label>
                     <div className="relative">
-                      <Calendar className="absolute left-3 top-2.5 w-3.5 h-3.5 text-gray-400 dark:text-zinc-500" />
                       <input
-                        type="text"
+                        type="date"
                         value={birthDate}
                         onChange={(e) => setBirthDate(e.target.value)}
-                        placeholder="e.g. DD-MM-YYYY (or any preferred format)"
-                        className="w-full pl-9 pr-3 py-2 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-gray-900 dark:text-white"
+                        className="w-full px-3 py-2 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-gray-900 dark:text-white"
                       />
                     </div>
                   </div>
