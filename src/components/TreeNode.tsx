@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import { getDirectPhotoUrl } from '../utils';
+import { useTheme } from '../context/ThemeContext';
 
 const isSafariOrIOS = typeof navigator !== 'undefined' && (
   /Apple/.test(navigator.vendor) || 
@@ -16,6 +17,8 @@ interface TreeNodeProps {
 
 export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode }) => {
   const navigate = useNavigate();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
 
   // Basic fields from primary datum
   const memberId = nodeDatum.id || nodeDatum.attributes?.id;
@@ -107,6 +110,24 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode }) => 
           ? 'hover:border-pink-500 hover:shadow-[0_10px_20px_-3px_rgba(244,63,94,0.35),_0_4px_6px_-2px_rgba(244,63,94,0.2)]'
           : 'hover:border-amber-500 hover:shadow-[0_10px_20px_-3px_rgba(197,160,89,0.35),_0_4px_6px_-2px_rgba(197,160,89,0.2)]');
 
+    // Theme values computed in JS to bypass Safari's dark mode foreignObject boundary selector inheritance bugs
+    const cardBgClass = isDark ? 'bg-zinc-850' : 'bg-white';
+    
+    const cardBorderClass = isFemaleCard
+      ? (isDark ? 'border-pink-950/45' : 'border-pink-200')
+      : (isDark ? 'border-zinc-800/80' : 'border-amber-200/80');
+
+    const avatarBgBorderClass = isDark
+      ? 'bg-zinc-800 border-zinc-700'
+      : 'bg-gray-50 border-gray-100';
+
+    const nameTextClass = isDark
+      ? 'text-zinc-150 group-hover:text-amber-400'
+      : 'text-gray-900 group-hover:text-amber-600';
+
+    const occupationTextClass = isDark ? 'text-zinc-500' : 'text-gray-400';
+    const birthTextClass = isDark ? 'text-zinc-600' : 'text-zinc-400';
+
     return (
       <div
         id={`tree-card-member-${m.id}`}
@@ -116,18 +137,14 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode }) => 
             navigate(`/member/${m.id}`);
           }
         }}
-        className={`w-[214px] h-[82px] p-2 bg-white dark:bg-zinc-850 border rounded-xl shadow-md flex items-center gap-2.5 text-left ${transitionClass} ${
+        className={`w-[214px] h-[82px] p-2 border rounded-xl shadow-md flex items-center gap-2.5 text-left ${cardBgClass} ${cardBorderClass} ${transitionClass} ${
           hasValidId
             ? `cursor-pointer group ${hoverScaleClass}`
             : 'cursor-default'
-        } ${
-          isFemaleCard
-            ? `border-pink-200 dark:border-pink-950/45 ${hoverBorderClass}`
-            : `border-amber-200/80 dark:border-white/5 ${hoverBorderClass}`
-        }`}
+        } ${hoverBorderClass}`}
       >
         {/* Node Avatar */}
-        <div className={`${isSafariOrIOS ? '' : 'relative'} w-11 h-11 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50 dark:bg-zinc-800 flex items-center justify-center border border-gray-105 dark:border-white/5 shadow-inner`}>
+        <div className={`${isSafariOrIOS ? '' : 'relative'} w-11 h-11 flex-shrink-0 rounded-lg overflow-hidden flex items-center justify-center border shadow-inner ${avatarBgBorderClass}`}>
           {m.photoUrl ? (
             <img
               src={getDirectPhotoUrl(m.photoUrl)}
@@ -158,16 +175,16 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode }) => 
 
         {/* Node Details */}
         <div className="flex-1 min-w-0 pr-1">
-          <h4 className="text-[11px] font-extrabold text-gray-900 dark:text-zinc-150 truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors leading-tight">
+          <h4 className={`text-[11px] font-extrabold truncate transition-colors leading-tight ${nameTextClass}`}>
             {mFullName}
           </h4>
           {m.occupation ? (
-            <p className="text-[9px] text-gray-400 dark:text-zinc-500 truncate leading-none mt-1">
+            <p className={`text-[9px] truncate leading-none mt-1 ${occupationTextClass}`}>
               {m.occupation}
             </p>
           ) : null}
           {m.birthDate && (
-            <p className="text-[8px] text-zinc-400 dark:text-zinc-600 font-mono leading-none mt-1">
+            <p className={`text-[8px] font-mono leading-none mt-1 ${birthTextClass}`}>
               b. {m.birthDate}
             </p>
           )}
@@ -189,7 +206,7 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode }) => 
       <circle
         r="11"
         fill={hasSpouse ? '#c5a059' : (isPrimaryFemale ? '#f43f5e' : '#c5a059')}
-        className="cursor-pointer hover:scale-120 transition-transform shadow-md stroke-2 stroke-white dark:stroke-zinc-950"
+        className={`cursor-pointer hover:scale-120 transition-transform shadow-md stroke-2 ${isDark ? 'stroke-zinc-950' : 'stroke-white'}`}
         onClick={toggleNode}
       />
       {hasChildren && (
