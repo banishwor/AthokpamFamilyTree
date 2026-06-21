@@ -15,6 +15,7 @@ import Members from './pages/Members';
 import MemberProfile from './pages/MemberProfile';
 import Login from './pages/Login';
 import RelationshipFinder from './pages/RelationshipFinder';
+import QuickUpdate from './pages/QuickUpdate';
 
 // Admin pages
 import AdminDashboard from './pages/AdminDashboard';
@@ -43,6 +44,7 @@ export default function App() {
               <Route path="/member/:id" element={<MemberProfile />} />
               <Route path="/relationship-finder" element={<RelationshipFinder />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/quick-update" element={<QuickUpdate />} />
 
               {/* Protected Administration Views */}
               <Route element={<ProtectedRoute />}>
