@@ -58,16 +58,16 @@ The app will run at `http://localhost:3000`.
 The project is fully pre-configured for automatic deployment to **GitHub Pages** using GitHub Actions.
 
 ### Deployment Flow
-Every time you push or merge a commit to the `main` (or `master`) branch:
+Every time you push or merge a commit to the `main` branch:
 1. The GitHub Actions runner checks out the repository.
 2. It installs dependencies and runs the build command (`npm run build`).
-3. The build output in the `dist/` directory is automatically pushed to the `gh-pages` branch.
-4. GitHub Pages serves the build output statically.
+3. The build output in the `dist/` directory is uploaded directly as a Pages artifact.
+4. GitHub Pages deploys the artifact live without needing a secondary branch.
 
 ### Setup Instructions for GitHub Pages
 To make sure the automatic deployment works:
-1. **Enable Write Permissions**: In your GitHub Repository, go to **Settings** -> **Actions** -> **General**. Under **Workflow permissions**, select **Read and write permissions** and click **Save**.
-2. **Configure Pages Branch**: Go to **Settings** -> **Pages**. Under **Build and deployment**, set **Source** to `Deploy from a branch`, choose `gh-pages` and `/ (root)`, and click **Save**.
+1. Go to your GitHub Repository, click **Settings** -> **Pages** (left sidebar).
+2. Under **Build and deployment** -> **Source**, change the dropdown selection from `Deploy from a branch` to **GitHub Actions**.
 
 ---
 
