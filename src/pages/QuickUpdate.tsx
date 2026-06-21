@@ -367,7 +367,7 @@ export const QuickUpdate: React.FC = () => {
               <form onSubmit={handleUploadSubmit} className="space-y-6">
                 <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-3">
                   <div className="space-y-0.5">
-                    <span className="text-[9px] font-black text-amber-650 bg-amber-500/10 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                    <span className="text-[9px] font-black text-amber-600 bg-amber-500/10 px-2 py-0.5 rounded-full uppercase tracking-wider">
                       Selected Member Profile
                     </span>
                     <h3 className="text-sm font-black text-gray-950 dark:text-white leading-snug">
@@ -501,7 +501,7 @@ export const QuickUpdate: React.FC = () => {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="w-full py-3 bg-amber-650 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600 text-white font-extrabold text-xs tracking-wider uppercase rounded-xl transition-all duration-300 shadow-md flex items-center justify-center gap-2 disabled:opacity-75"
+                  className="w-full py-3 bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600 text-white font-extrabold text-xs tracking-wider uppercase rounded-xl transition-all duration-300 shadow-md flex items-center justify-center gap-2 disabled:opacity-75"
                 >
                   {saving ? (
                     <>

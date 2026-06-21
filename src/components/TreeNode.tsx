@@ -167,7 +167,7 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode }) => 
           {!isSafariOrIOS && (
             <div
               className={`absolute bottom-0.5 right-0.5 w-2 h-2 rounded-full border border-white ${
-                isFemaleCard ? 'bg-pink-500' : 'bg-amber-650'
+                isFemaleCard ? 'bg-pink-500' : 'bg-amber-600'
               }`}
             />
           )}
