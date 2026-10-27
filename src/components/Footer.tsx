@@ -13,7 +13,24 @@ export const Footer: React.FC = () => {
 
   return (
     <footer id="main-footer" className="bg-gray-50 dark:bg-zinc-950 border-t border-gray-200 dark:border-white/5 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      {/* Mobile: one slim line only — the full three-column footer
+          was a long scroll of information on phones. */}
+      <div className="md:hidden px-4 py-5 text-center space-y-1">
+        <div className="flex items-center justify-center gap-2">
+          <div className="w-5 h-5 rounded-full border border-amber-600 flex items-center justify-center">
+            <div className="w-1 h-1 bg-amber-600 rounded-full"></div>
+          </div>
+          <span className="font-semibold tracking-widest text-[#ae8b47] dark:text-[#c5a059] uppercase text-[11px]">
+            Athokpam Family Tree
+          </span>
+        </div>
+        <p className="text-[11px] text-gray-400 dark:text-zinc-500 flex items-center justify-center gap-1">
+          <span>© {currentYear} · Preserved with</span>
+          <Heart className="w-3 h-3 text-red-500 fill-red-500" />
+          <span>for future generations</span>
+        </p>
+      </div>
+      <div className="hidden md:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Column 1: Info */}
           <div className="space-y-4">

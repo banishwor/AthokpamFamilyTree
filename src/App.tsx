@@ -8,6 +8,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminBottomNav from './components/AdminBottomNav';
+import PublicBottomNav from './components/PublicBottomNav';
 
 // Public pages
 import Home from './pages/Home';
@@ -86,6 +87,7 @@ export default function App() {
             <Footer />
           </SiteChrome>
           <AdminBottomNav />
+          <PublicBottomNav />
         </div>
         
         {/* React Hot Toast configurations */}

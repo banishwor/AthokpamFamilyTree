@@ -39,7 +39,7 @@ const MobileHome: React.FC<{ members: Member[]; loading: boolean; error: string 
     { to: '/tree', icon: GitMerge, title: 'Family Tree', desc: 'Explore the interactive tree', gold: true },
     { to: '/members', icon: Users, title: 'Members', desc: `Browse all ${stats.total} profiles`, gold: false },
     { to: '/charts', icon: Images, title: 'Charts', desc: 'Descendant & ancestor charts', gold: false },
-    { to: '/relationship', icon: Network, title: 'Relationship', desc: 'How are two people related?', gold: false },
+    { to: '/relationship-finder', icon: Network, title: 'Relationship', desc: 'How are two people related?', gold: false },
   ];
 
   return (
@@ -55,6 +55,20 @@ const MobileHome: React.FC<{ members: Member[]; loading: boolean; error: string 
         <p className="mt-3 text-[15px] leading-relaxed text-gray-600 dark:text-zinc-400 max-w-sm mx-auto">
           Our ancestral roots, preserved — the Athokpam family tree, its people and their stories.
         </p>
+        {elders.length > 0 && (
+          <div className="mt-5 flex items-center justify-center">
+            <div className="flex -space-x-3">
+              {elders.slice(0, 5).map((m) => (
+                <span key={m.id} className="ring-[3px] ring-[#FDFBF6] dark:ring-zinc-950 rounded-full">
+                  <Avatar member={m} size={44} />
+                </span>
+              ))}
+            </div>
+            <span className="ml-3 text-[13px] font-bold text-gray-500 dark:text-zinc-400">
+              {stats.total} family members
+            </span>
+          </div>
+        )}
         <Link
           to="/tree"
           className="mt-6 flex items-center justify-center gap-2 w-full min-h-[54px] rounded-2xl bg-amber-600 text-white text-base font-extrabold shadow-lg shadow-amber-600/20 active:bg-amber-700"
