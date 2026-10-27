@@ -129,3 +129,75 @@
 .overscroll-contain-y {
   overscroll-behavior-y: contain;
 }
+
+/* ---- Descendant chart (shareable image) ----
+   Classic CSS tree connectors, scoped to .dchart. The chart itself is
+   always light/parchment — it is drawn to be exported as a photo and
+   shared on social media, whatever the site theme is. */
+.dchart ul {
+  display: flex;
+  justify-content: center;
+  padding-top: 24px;
+  position: relative;
+  margin: 0;
+  list-style: none;
+}
+.dchart li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  padding: 24px 10px 0 10px;
+}
+.dchart li::before,
+.dchart li::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 50%;
+  width: 50%;
+  height: 24px;
+  border-top: 2px solid #c3a35f;
+}
+.dchart li::after {
+  right: auto;
+  left: 50%;
+  border-left: 2px solid #c3a35f;
+}
+.dchart li:only-child::before,
+.dchart li:only-child::after {
+  display: none;
+}
+.dchart li:first-child::before,
+.dchart li:last-child::after {
+  border: 0 none;
+}
+.dchart li:last-child::before {
+  border-right: 2px solid #c3a35f;
+  border-radius: 0 8px 0 0;
+}
+.dchart li:first-child::after {
+  border-radius: 8px 0 0 0;
+}
+.dchart ul::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 0;
+  height: 24px;
+  border-left: 2px solid #c3a35f;
+}
+.dchart > ul {
+  padding-top: 0;
+}
+.dchart > ul::before {
+  display: none;
+}
+.dchart > ul > li {
+  padding-top: 0;
+}
+.dchart > ul > li::before,
+.dchart > ul > li::after {
+  display: none;
+}

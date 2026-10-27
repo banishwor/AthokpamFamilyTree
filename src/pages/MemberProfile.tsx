@@ -4,6 +4,7 @@ import { apiService } from '../services/api';
 import { Member, Ancestor } from '../types';
 import { getDirectPhotoUrl } from '../utils';
 import {
+  Network,
   Calendar,
   Briefcase,
   MapPin,
@@ -231,6 +232,14 @@ export const MemberProfile: React.FC = () => {
           >
             <ChevronLeft className="w-4 h-4" />
             Back to Directory
+          </button>
+          <button
+            id="btn-profile-descendant-chart"
+            onClick={() => navigate(`/chart/${member.id}`)}
+            className="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+          >
+            <Network className="w-4 h-4" />
+            Descendant Chart
           </button>
         </div>
 
