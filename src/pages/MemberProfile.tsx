@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { apiService } from '../services/api';
 import { Member, Ancestor } from '../types';
 import { getDirectPhotoUrl } from '../utils';
+import MobileProfile from '../components/mobile/MobileProfile';
 import {
   Network,
   History,
@@ -221,6 +222,20 @@ export const MemberProfile: React.FC = () => {
   const ageValue = getAge();
 
   return (
+    <>
+      <div className="md:hidden">
+        {member && (
+          <MobileProfile
+            member={member}
+            parents={parents}
+            spouse={spouse}
+            children={children}
+            siblings={siblings}
+            ancestors={ancestors}
+          />
+        )}
+      </div>
+      <div className="hidden md:block">
     <div id="member-profile-view" className="min-h-screen bg-gray-50/50 dark:bg-zinc-950 py-8 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
@@ -703,6 +718,8 @@ export const MemberProfile: React.FC = () => {
 
       </div>
     </div>
+      </div>
+    </>
   );
 };
 

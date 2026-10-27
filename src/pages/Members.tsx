@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import useMembers from '../hooks/useMembers';
 import SearchBar from '../components/SearchBar';
 import MemberCard from '../components/MemberCard';
+import MobileDirectory from '../components/mobile/MobileDirectory';
 import { Loader2, Users, ArrowUpDown } from 'lucide-react';
 
 export const Members: React.FC = () => {
@@ -63,6 +64,11 @@ export const Members: React.FC = () => {
   }, [members, searchText, selectedGender, sortBy]);
 
   return (
+    <>
+      <div className="md:hidden">
+        <MobileDirectory members={members} loading={loading} error={error} />
+      </div>
+      <div className="hidden md:block">
     <div id="members-list-page" className="min-h-screen bg-gray-50/55 dark:bg-zinc-950 px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-300 animate-fade-in">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header Title bar */}
@@ -151,6 +157,8 @@ export const Members: React.FC = () => {
         )}
       </div>
     </div>
+      </div>
+    </>
   );
 };
 

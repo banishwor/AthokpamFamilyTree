@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import useMembers from '../hooks/useMembers';
 import { GitMerge, Users, Shield, Calendar, ArrowRight, Loader2, Sparkles, Image as ImageIcon } from 'lucide-react';
 import { getDirectPhotoUrl } from '../utils';
+import MobileHome from '../components/mobile/MobileHome';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -54,6 +55,11 @@ export const Home: React.FC = () => {
   }, [members]);
 
   return (
+    <>
+      <div className="md:hidden">
+        <MobileHome members={members} loading={loading} error={error} />
+      </div>
+      <div className="hidden md:block">
     <div id="home-page-container" className="min-h-screen bg-gray-50/50 dark:bg-zinc-950 transition-colors duration-300">
       {/* 1. Hero Section */}
       <section id="hero-section" className="relative py-20 lg:py-28 overflow-hidden bg-gradient-to-b from-amber-50/50 via-white to-gray-50/50 dark:from-zinc-900 dark:via-zinc-900/60 dark:to-zinc-950">
@@ -297,6 +303,8 @@ export const Home: React.FC = () => {
         )}
       </section>
     </div>
+      </div>
+    </>
   );
 };
 
