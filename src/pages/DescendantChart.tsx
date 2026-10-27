@@ -17,9 +17,17 @@ import {
 const CHART_BG = '#FDFBF6';
 const SITE_LINK = 'banishwor.github.io/AthokpamFamilyTree';
 
+function yearOf(dateStr?: string): string {
+  if (!dateStr) return '';
+  // Dates arrive as UTC ISO strings (a 1 Jan 1950 IST birth is stored
+  // as 1949-12-31T18:30Z) — parse, don't slice, or the year shifts.
+  const y = new Date(dateStr).getFullYear();
+  return Number.isNaN(y) ? '' : String(y);
+}
+
 function yearsOf(m: Member): string {
-  const b = m.birthDate ? m.birthDate.slice(0, 4) : '';
-  const d = m.deathDate ? m.deathDate.slice(0, 4) : '';
+  const b = yearOf(m.birthDate);
+  const d = yearOf(m.deathDate);
   if (!b && !d) return '';
   return d ? `${b} – ${d}` : `b. ${b}`;
 }
