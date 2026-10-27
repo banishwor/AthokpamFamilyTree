@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Loader2, Save, Trash2 } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Loader2, Save, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Member } from '../../types';
 import { apiService } from '../../services/api';
@@ -7,7 +7,7 @@ import SearchableSelect from '../SearchableSelect';
 import PhotoPickerField from '../PhotoPickerField';
 import { ProcessedPhoto } from '../../utils/image';
 import { formatDateInput, fullName, memberCompleteness, saveMemberWithSpouseLink } from '../../utils/memberSave';
-import { GenderToggle, MobileSection, mobileInputCls, mobileLabelCls } from './shared';
+import { GenderToggle, mobileInputCls, mobileLabelCls } from './shared';
 
 interface MemberHubProps {
   member: Member;
@@ -34,6 +34,28 @@ function fieldsFromMember(m: Member): HubFields {
     occupation: m.occupation || '', education: m.education || '', address: m.address || '', bio: m.bio || '',
   };
 }
+
+/** Contacts-style collapsible section: the summary line shows the
+ *  current values, so the profile reads at a glance with no scroll;
+ *  tapping expands just that group for editing. */
+const HubSection: React.FC<{
+  title: string;
+  summary: string;
+  open: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}> = ({ title, summary, open, onToggle, children }) => (
+  <section className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-3xl shadow-sm overflow-hidden">
+    <button type="button" onClick={onToggle} className="w-full min-h-[60px] px-5 py-3 flex items-center gap-3 text-left active:bg-gray-50 dark:active:bg-zinc-800/50" aria-expanded={open}>
+      <span className="min-w-0 flex-1">
+        <span className="block text-sm font-black uppercase tracking-wider text-gray-900 dark:text-white">{title}</span>
+        {!open && <span className="block text-sm text-gray-400 truncate mt-0.5">{summary}</span>}
+      </span>
+      <ChevronDown className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
+    </button>
+    {open && <div className="px-5 pb-5 pt-1 space-y-4">{children}</div>}
+  </section>
+);
 
 /**
  * Member Hub — the phone-first editor. Portrait and every detail
@@ -83,6 +105,20 @@ export const MemberHub: React.FC<MemberHubProps> = ({ member, allMembers, onClos
   }, [fields, dirty, draftKey, photo]);
 
   const set = (k: keyof HubFields) => (v: string) => setFields((f) => ({ ...f, [k]: v }));
+  const [openSection, setOpenSection] = useState<string>('basic');
+  const toggleSection = (id: string) => setOpenSection((cur) => (cur === id ? '' : id));
+  const nameOf = (id: string) => {
+    const m = allMembers.find((x) => String(x.id) === id);
+    return m ? fullName(m) : '';
+  };
+  const familySummary =
+    [
+      fields.fatherId ? `Father: ${nameOf(fields.fatherId)}` : '',
+      fields.motherId ? `Mother: ${nameOf(fields.motherId)}` : '',
+      fields.spouseId ? `Spouse: ${nameOf(fields.spouseId)}` : '',
+    ]
+      .filter(Boolean)
+      .join(' · ') || 'No family linked yet';
   const candidates = allMembers.filter((m) => String(m.id) !== String(member.id));
   const toOptions = (list: Member[]) => list.map((m) => ({ id: String(m.id), name: fullName(m) }));
   const { percent } = memberCompleteness(member);
@@ -154,7 +190,7 @@ export const MemberHub: React.FC<MemberHubProps> = ({ member, allMembers, onClos
   };
 
   return (
-    <div className="fixed inset-0 z-50 md:hidden bg-gray-50 dark:bg-zinc-950 overflow-y-auto">
+    <div className="fixed inset-0 z-50 md:hidden bg-gray-50 dark:bg-zinc-950 overflow-y-auto animate-view-in overscroll-contain-y">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-gray-50/90 dark:bg-zinc-950/90 backdrop-blur-md px-4 pt-3 pb-2 flex items-center gap-2">
         <button onClick={handleBack} className="min-w-[44px] min-h-[44px] flex items-center justify-center -ml-2 text-gray-700 dark:text-zinc-200" aria-label="Back to members">
@@ -167,11 +203,11 @@ export const MemberHub: React.FC<MemberHubProps> = ({ member, allMembers, onClos
       </div>
 
       <div className="px-4 pb-40 space-y-4">
-        <MobileSection title="Portrait">
-          <PhotoPickerField currentPhotoUrl={member.photoUrl} memberName={fullName(member)} value={photo} onChange={setPhoto} />
-        </MobileSection>
+        <div className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-3xl p-4 shadow-sm">
+          <PhotoPickerField variant="compact" currentPhotoUrl={member.photoUrl} memberName={fullName(member)} value={photo} onChange={setPhoto} />
+        </div>
 
-        <MobileSection title="Basic Info">
+        <HubSection title="Basic Info" summary={`${fields.gender === 'F' ? 'Female' : 'Male'} · ${`${fields.firstName} ${fields.lastName}`.trim()}`} open={openSection === 'basic'} onToggle={() => toggleSection('basic')}>
           <div>
             <label className={mobileLabelCls} htmlFor="hub-first">First Name *</label>
             <input id="hub-first" className={mobileInputCls} value={fields.firstName} onChange={(e) => set('firstName')(e.target.value)} placeholder="First name" />
@@ -188,9 +224,9 @@ export const MemberHub: React.FC<MemberHubProps> = ({ member, allMembers, onClos
             <span className={mobileLabelCls}>Gender *</span>
             <GenderToggle value={fields.gender} onChange={set('gender')} />
           </div>
-        </MobileSection>
+        </HubSection>
 
-        <MobileSection title="Family Links">
+        <HubSection title="Family Links" summary={familySummary} open={openSection === 'family'} onToggle={() => toggleSection('family')}>
           <div>
             <span className={mobileLabelCls}>Father</span>
             <SearchableSelect id="hub-father" value={fields.fatherId} onChange={set('fatherId')} emptyLabel="-- No Father linked --" placeholder="Select father" options={toOptions(candidates.filter((m) => m.gender === 'M'))} />
@@ -203,9 +239,9 @@ export const MemberHub: React.FC<MemberHubProps> = ({ member, allMembers, onClos
             <span className={mobileLabelCls}>Spouse</span>
             <SearchableSelect id="hub-spouse" value={fields.spouseId} onChange={set('spouseId')} emptyLabel="-- No Spouse linked --" placeholder="Select spouse" options={toOptions(candidates.filter((m) => (fields.gender === 'M' ? m.gender === 'F' : fields.gender === 'F' ? m.gender === 'M' : true)))} />
           </div>
-        </MobileSection>
+        </HubSection>
 
-        <MobileSection title="Dates">
+        <HubSection title="Dates" summary={fields.birthDate ? `Born ${fields.birthDate}` : 'No dates recorded'} open={openSection === 'dates'} onToggle={() => toggleSection('dates')}>
           <div>
             <label className={mobileLabelCls} htmlFor="hub-birth">Birth Date</label>
             <input id="hub-birth" type="date" className={mobileInputCls} value={fields.birthDate} onChange={(e) => set('birthDate')(e.target.value)} />
@@ -215,9 +251,9 @@ export const MemberHub: React.FC<MemberHubProps> = ({ member, allMembers, onClos
             <input id="hub-death" type="date" className={mobileInputCls} value={fields.deathDate} onChange={(e) => set('deathDate')(e.target.value)} />
             <p className="text-xs text-gray-400 mt-1.5">Leave empty if alive.</p>
           </div>
-        </MobileSection>
+        </HubSection>
 
-        <MobileSection title="Details">
+        <HubSection title="Details" summary={fields.occupation || fields.education || fields.address || 'Mostly empty'} open={openSection === 'details'} onToggle={() => toggleSection('details')}>
           <div>
             <label className={mobileLabelCls} htmlFor="hub-occ">Occupation</label>
             <input id="hub-occ" className={mobileInputCls} value={fields.occupation} onChange={(e) => set('occupation')(e.target.value)} placeholder="e.g. Teacher, Farmer" />
@@ -234,7 +270,7 @@ export const MemberHub: React.FC<MemberHubProps> = ({ member, allMembers, onClos
             <label className={mobileLabelCls} htmlFor="hub-bio">Biography &amp; Notes</label>
             <textarea id="hub-bio" rows={4} className={`${mobileInputCls} h-auto`} value={fields.bio} onChange={(e) => set('bio')(e.target.value)} placeholder="Short life history, achievements..." />
           </div>
-        </MobileSection>
+        </HubSection>
 
         <section className="bg-red-50/60 dark:bg-red-950/10 border border-red-100 dark:border-red-950/40 rounded-3xl p-5">
           <h3 className="text-sm font-black uppercase tracking-wider text-red-700 dark:text-red-400 mb-2">Danger Zone</h3>

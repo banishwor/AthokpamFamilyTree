@@ -252,7 +252,7 @@ export const QuickUpdate: React.FC = () => {
 
   /* ---------------- Find panel ---------------- */
   const findPanel = (
-    <div className="md:bg-white md:dark:bg-zinc-900 md:border md:border-gray-150 md:dark:border-white/5 md:rounded-3xl md:p-5 md:shadow-sm">
+    <div className="animate-view-in md:bg-white md:dark:bg-zinc-900 md:border md:border-gray-150 md:dark:border-white/5 md:rounded-3xl md:p-5 md:shadow-sm">
       {/* Sticky on mobile: title + search stay pinned while the names scroll */}
       <div className="sticky top-0 z-20 -mx-4 px-4 pt-3 pb-3 bg-gray-50 dark:bg-zinc-950 md:static md:mx-0 md:px-0 md:pt-0 md:pb-0 md:bg-transparent">
         <div className="space-y-1 md:mb-4">
@@ -326,7 +326,7 @@ export const QuickUpdate: React.FC = () => {
 
   /* ---------------- Done panel ---------------- */
   const donePanel = (
-    <div className="bg-white dark:bg-zinc-900 border border-gray-150 dark:border-white/5 rounded-3xl p-8 shadow-sm text-center space-y-5">
+    <div className="animate-view-in bg-white dark:bg-zinc-900 border border-gray-150 dark:border-white/5 rounded-3xl p-8 shadow-sm text-center space-y-5">
       <span className="mx-auto w-20 h-20 rounded-full overflow-hidden bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900 flex items-center justify-center">
         {savedPhotoUrl ? (
           <img src={getDirectPhotoUrl(savedPhotoUrl)} alt={savedName} className="w-full h-full object-cover" />
@@ -353,7 +353,7 @@ export const QuickUpdate: React.FC = () => {
 
   /* ---------------- Edit panel ---------------- */
   const editPanel = selectedMember && (
-    <div id="edit-form-panel" className="bg-white dark:bg-zinc-900 border border-gray-150 dark:border-white/5 rounded-3xl p-5 sm:p-6 shadow-sm">
+    <div id="edit-form-panel" className="animate-view-in bg-white dark:bg-zinc-900 border border-gray-150 dark:border-white/5 rounded-3xl p-5 sm:p-6 shadow-sm">
       <form onSubmit={handleUploadSubmit} className="space-y-6">
         <div className="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800 pb-4">
           <div>
@@ -383,6 +383,7 @@ export const QuickUpdate: React.FC = () => {
         >
           <span className={labelCls}>Profile Picture</span>
           <PhotoPickerField
+            variant="compact"
             currentPhotoUrl={selectedMember.photoUrl}
             memberName={`${selectedMember.firstName} ${selectedMember.lastName}`}
             value={photo}
@@ -455,12 +456,14 @@ export const QuickUpdate: React.FC = () => {
               <ArrowLeft className="w-4 h-4" /> All profiles
             </button>
           )}
-          <h1 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight">
-            Family Quick Update Portal
-          </h1>
-          <p className="text-xs text-gray-400 uppercase tracking-widest font-bold">
-            EDIT YOUR PROFILE DETAILS DIRECTLY IN THE GENEALOGY DB
-          </p>
+          <div className={view !== 'find' ? 'hidden md:block' : ''}>
+            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight">
+              Family Quick Update Portal
+            </h1>
+            <p className="text-xs text-gray-400 uppercase tracking-widest font-bold mt-2">
+              EDIT YOUR PROFILE DETAILS DIRECTLY IN THE GENEALOGY DB
+            </p>
+          </div>
         </div>
 
         {/* Mobile: one step at a time. Desktop: both panels side by side. */}

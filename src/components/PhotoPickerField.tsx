@@ -10,6 +10,12 @@ interface PhotoPickerFieldProps {
   memberName?: string;
   value: ProcessedPhoto | null;
   onChange: (photo: ProcessedPhoto | null) => void;
+  /**
+   * large: full photo area + two buttons (creation flows).
+   * compact: avatar row with a camera badge; tapping opens a
+   * native-style bottom action sheet (one-screen edit screens).
+   */
+  variant?: 'large' | 'compact';
 }
 
 /**
@@ -22,7 +28,9 @@ export const PhotoPickerField: React.FC<PhotoPickerFieldProps> = ({
   memberName,
   value,
   onChange,
+  variant = 'large',
 }) => {
+  const [sheetOpen, setSheetOpen] = useState(false);
   const uid = useId().replace(/[:]/g, '');
   const cameraId = `camera-input-${uid}`;
   const galleryId = `gallery-input-${uid}`;
@@ -47,6 +55,73 @@ export const PhotoPickerField: React.FC<PhotoPickerFieldProps> = ({
   };
 
   const shownUrl = value?.previewUrl || (currentPhotoUrl ? getDirectPhotoUrl(currentPhotoUrl) : '');
+
+  if (variant === 'compact') {
+    return (
+      <div>
+        <input id={cameraId} type="file" accept="image/*" capture="environment" onChange={handleFile} className="hidden" />
+        <input id={galleryId} type="file" accept="image/*" onChange={handleFile} className="hidden" />
+
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={() => setSheetOpen(true)}
+            className="relative flex-shrink-0 active:scale-[0.97] transition"
+            aria-label="Change portrait photo"
+          >
+            <span className="block w-20 h-20 rounded-full overflow-hidden bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700">
+              {shownUrl ? (
+                <img src={shownUrl} alt={memberName || 'Member portrait'} className="w-full h-full object-cover" />
+              ) : (
+                <span className="w-full h-full flex items-center justify-center">
+                  <ImagePlus className="w-8 h-8 text-gray-400" />
+                </span>
+              )}
+            </span>
+            <span className="absolute bottom-0 right-0 w-8 h-8 bg-amber-600 border-2 border-white dark:border-zinc-900 rounded-full flex items-center justify-center">
+              {processing ? <Loader2 className="w-4 h-4 text-white animate-spin" /> : <Camera className="w-4 h-4 text-white" />}
+            </span>
+          </button>
+          <div className="min-w-0">
+            <p className="text-base font-bold text-gray-900 dark:text-white truncate">{memberName || 'Portrait'}</p>
+            <p className="text-sm text-gray-400 mt-0.5">Tap the photo to change it</p>
+            {value && (
+              <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400 mt-1">
+                New photo ready · {formatBytes(value.originalBytes)} → {formatBytes(value.compressedBytes)}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {sheetOpen && (
+          <div className="fixed inset-0 z-[80] bg-black/50 flex items-end justify-center" onClick={() => setSheetOpen(false)}>
+            <div className="w-full max-w-md p-3 pb-5 animate-sheet-up" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)' }} onClick={(e) => e.stopPropagation()}>
+              <div className="bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden">
+                <label htmlFor={cameraId} onClick={() => setSheetOpen(false)} className="w-full min-h-[56px] px-5 flex items-center gap-3 text-base font-semibold text-gray-900 dark:text-white active:bg-gray-50 dark:active:bg-zinc-800 cursor-pointer">
+                  <Camera className="w-5 h-5 text-amber-600" /> Take Photo
+                </label>
+                <div className="h-px bg-gray-100 dark:bg-zinc-800 mx-5" />
+                <label htmlFor={galleryId} onClick={() => setSheetOpen(false)} className="w-full min-h-[56px] px-5 flex items-center gap-3 text-base font-semibold text-gray-900 dark:text-white active:bg-gray-50 dark:active:bg-zinc-800 cursor-pointer">
+                  <ImagePlus className="w-5 h-5 text-amber-600" /> Choose from Gallery
+                </label>
+                {value && (
+                  <>
+                    <div className="h-px bg-gray-100 dark:bg-zinc-800 mx-5" />
+                    <button type="button" onClick={() => { onChange(null); setSheetOpen(false); }} className="w-full min-h-[56px] px-5 flex items-center gap-3 text-base font-semibold text-red-600 dark:text-red-400 text-left active:bg-red-50 dark:active:bg-red-950/20">
+                      <X className="w-5 h-5" /> Remove New Photo
+                    </button>
+                  </>
+                )}
+              </div>
+              <button type="button" onClick={() => setSheetOpen(false)} className="w-full min-h-[52px] mt-2 bg-white dark:bg-zinc-900 rounded-3xl text-base font-bold text-gray-700 dark:text-zinc-200">
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">

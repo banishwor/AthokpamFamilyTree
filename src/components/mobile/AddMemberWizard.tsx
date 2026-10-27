@@ -106,7 +106,7 @@ export const AddMemberWizard: React.FC<AddMemberWizardProps> = ({ allMembers, on
   };
 
   return (
-    <div className="fixed inset-0 z-50 md:hidden bg-gray-50 dark:bg-zinc-950 overflow-y-auto">
+    <div className="fixed inset-0 z-50 md:hidden bg-gray-50 dark:bg-zinc-950 overflow-y-auto animate-view-in overscroll-contain-y">
       <div className="sticky top-0 z-10 bg-gray-50/90 dark:bg-zinc-950/90 backdrop-blur-md px-4 pt-3 pb-2">
         <div className="flex items-center gap-2">
           <button onClick={() => (step > 1 ? setStep(step - 1) : onClose())} className="min-w-[44px] min-h-[44px] flex items-center justify-center -ml-2 text-gray-700 dark:text-zinc-200" aria-label="Back">

@@ -98,7 +98,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           <div
             role="listbox"
             aria-label={placeholder || emptyLabel}
-            className="bg-white dark:bg-zinc-900 w-full sm:max-w-md max-h-[82dvh] rounded-t-3xl sm:rounded-3xl flex flex-col overflow-hidden"
+            className="bg-white dark:bg-zinc-900 w-full sm:max-w-md max-h-[82dvh] rounded-t-3xl sm:rounded-3xl flex flex-col overflow-hidden animate-sheet-up"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Search header */}
