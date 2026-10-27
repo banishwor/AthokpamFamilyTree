@@ -14,9 +14,11 @@ import { useTheme } from '../context/ThemeContext';
  * dots, so the tree looked "all disconnected". Pure SVG elements
  * transform identically in every browser, phones included.
  *
- * Card geometry (node-local coords): card top at y=12, height 82,
- * so the bottom edge is y=94. FamilyTree's customPathFunc is tuned
- * to these numbers — change them together.
+ * Card geometry (node-local coords): card top at y=20, height 82,
+ * so the bottom edge is y=102. The toggle dot (r=11) ends at y=11,
+ * leaving a 9px band where the incoming connector line is visible
+ * between dot and card. FamilyTree's customPathFunc is tuned to
+ * these numbers — change them together.
  */
 
 interface TreeNodeProps {
@@ -34,7 +36,7 @@ interface TreeNodeProps {
 
 export const CARD_W = 214;
 export const CARD_H = 82;
-export const CARD_TOP = 12;
+export const CARD_TOP = 20;
 
 function truncate(text: string, max: number): string {
   const t = (text || '').trim();

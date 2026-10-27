@@ -12,20 +12,21 @@ import { Link } from 'react-router-dom';
 import { Loader2, GitMerge, RefreshCw, ZoomIn, ZoomOut, Info, Crosshair, Home, Expand, Minimize2 } from 'lucide-react';
 
 // Custom SVG path drawing function to connect children from the bottom-middle of parents' cards.
-// TreeNode draws pure-SVG cards with their top at node y+12 and
-// bottom edge at y+94 (CARD_TOP/CARD_H in TreeNode.tsx). The line
+// TreeNode draws pure-SVG cards with their top at node y+20 and
+// bottom edge at y+102 (CARD_TOP/CARD_H in TreeNode.tsx). The line
 // starts a few px INSIDE the parent card and ends a few px UNDER
 // the child card's top edge — links paint below nodes, so the card
 // fills cover the overlaps and the visible line runs continuously
-// card → dot → card. (Ending the line at the node point left a
-// white gap under the dot, which is what made the tree look
+// card → dot → card, with a clear segment between the dot (ends
+// y+11) and the card top (y+20). (Ending the line at the node
+// point left the dot floating, which is what made the tree look
 // disconnected, worst on iPhone.)
 const customPathFunc = (link: any) => {
   const { source, target } = link;
   const startX = source.x;
-  const startY = source.y + 90;
+  const startY = source.y + 98;
   const endX = target.x;
-  const endY = target.y + 16;
+  const endY = target.y + 26;
 
   // Let's find the midway point vertically between the parent bottom and child top joint
   const midY = (startY + endY) / 2;
