@@ -9,7 +9,7 @@ import { Member } from '../types';
 import { fullName, sortedByName } from '../utils/memberSave';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
-import { Loader2, GitMerge, RefreshCw, ZoomIn, ZoomOut, Info, Maximize2, Home, Expand, Minimize2 } from 'lucide-react';
+import { Loader2, GitMerge, RefreshCw, ZoomIn, ZoomOut, Info, Crosshair, Home, Expand, Minimize2 } from 'lucide-react';
 
 // Custom SVG path drawing function to connect children from the bottom-middle of parents' cards
 const customPathFunc = (link: any) => {
@@ -55,8 +55,20 @@ export const FamilyTree: React.FC = () => {
   // Fullscreen (with landscape lock on Android) — the tree is wide,
   // so a landscape fullscreen view is its natural shape on a phone.
   const [isFullscreen, setIsFullscreen] = useState(false);
+  // The view (pan + zoom) as it was before entering fullscreen, so
+  // leaving fullscreen returns to exactly where the user was.
+  const viewBeforeFs = useRef<{ x: number; y: number; zoom: number } | null>(null);
   useEffect(() => {
-    const onFsChange = () => setIsFullscreen(!!document.fullscreenElement);
+    const onFsChange = () => {
+      const active = !!document.fullscreenElement;
+      setIsFullscreen(active);
+      if (!active && viewBeforeFs.current) {
+        const v = viewBeforeFs.current;
+        viewBeforeFs.current = null;
+        setTranslate({ x: v.x, y: v.y });
+        setZoom(v.zoom);
+      }
+    };
     document.addEventListener('fullscreenchange', onFsChange);
     return () => document.removeEventListener('fullscreenchange', onFsChange);
   }, []);
@@ -68,6 +80,7 @@ export const FamilyTree: React.FC = () => {
       }
       const el = containerRef.current as any;
       if (!el || typeof el.requestFullscreen !== 'function') throw new Error('unsupported');
+      viewBeforeFs.current = { x: translate.x, y: translate.y, zoom };
       await el.requestFullscreen();
       // Best-effort landscape lock (Android Chrome/Samsung Internet;
       // iOS Safari has no orientation lock — fullscreen alone helps).
@@ -76,7 +89,11 @@ export const FamilyTree: React.FC = () => {
       } catch {
         /* unsupported — ignore */
       }
-      window.setTimeout(() => handleRecenter(), 500);
+      // Recenter for the wide screen, keeping the user's own zoom —
+      // their exact view is restored on exit (see onFsChange).
+      window.setTimeout(() => {
+        setTranslate({ x: containerRef.current?.clientWidth ? containerRef.current.clientWidth / 2 : translate.x, y: 80 });
+      }, 500);
     } catch {
       toast('Fullscreen is not available in this browser. Try rotating your phone sideways.', { icon: 'ℹ️' });
     }
@@ -227,7 +244,7 @@ export const FamilyTree: React.FC = () => {
               onClick={handleRecenter}
               className="px-3.5 py-1.5 bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 border border-gray-200 dark:border-zinc-805 rounded-xl text-xs font-extrabold flex items-center gap-1.5 shadow-sm transition-all"
             >
-              <Maximize2 className="w-3.5 h-3.5" />
+              <Crosshair className="w-3.5 h-3.5" />
               Recenter Tree
             </button>
             <button
@@ -273,7 +290,7 @@ export const FamilyTree: React.FC = () => {
             aria-label="Recenter tree"
             className="w-11 h-11 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-300 shadow-sm"
           >
-            <Maximize2 className="w-5 h-5" />
+            <Crosshair className="w-5 h-5" />
           </button>
           <button
             type="button"
@@ -383,7 +400,7 @@ export const FamilyTree: React.FC = () => {
                     className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-700 dark:text-zinc-200 active:scale-95 transition"
                     aria-label="Recenter tree"
                   >
-                    <Maximize2 className="w-5 h-5" />
+                    <Crosshair className="w-5 h-5" />
                   </button>
                   <button
                     type="button"
@@ -422,7 +439,7 @@ export const FamilyTree: React.FC = () => {
                   aria-label="Recenter tree"
                   title="Recenter tree"
                 >
-                  <Maximize2 className="w-5 h-5" />
+                  <Crosshair className="w-5 h-5" />
                 </button>
                 <div className="w-6 h-px bg-gray-200 dark:bg-zinc-800" />
                 <button
