@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import useMembers from '../hooks/useMembers';
 import { shortId } from '../components/SearchableSelect';
+import MobileAdminHome from '../components/mobile/MobileAdminHome';
 import {
   Users,
   Image as ImageIcon,
@@ -70,7 +71,10 @@ export const AdminDashboard: React.FC = () => {
 
   return (
     <div id="admin-dashboard-container" className="min-h-screen bg-gray-50/50 dark:bg-zinc-950 transition-all px-4 sm:px-6 lg:px-8 pt-8 pb-24 md:pb-8">
-      <div className="max-w-7xl mx-auto space-y-8 animate-fade-in">
+      <div className="md:hidden max-w-7xl mx-auto">
+        <MobileAdminHome members={members} loading={loading} />
+      </div>
+      <div className="hidden md:block max-w-7xl mx-auto space-y-8 animate-fade-in">
         
         {/* Header Ribbon section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 dark:border-zinc-850 pb-6">

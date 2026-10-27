@@ -5,6 +5,7 @@ import useMembers from '../hooks/useMembers';
 import { Member } from '../types';
 import { getDirectPhotoUrl } from '../utils';
 import SearchableSelect, { shortId } from '../components/SearchableSelect';
+import MobileMembers from '../components/mobile/MobileMembers';
 import {
   Plus,
   Search,
@@ -276,7 +277,10 @@ export const AdminMembers: React.FC = () => {
 
   return (
     <div id="admin-members-page" className="min-h-screen bg-gray-50/50 dark:bg-zinc-950 transition-colors duration-300 px-4 sm:px-6 lg:px-8 pt-8 pb-24 md:pb-8">
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="md:hidden max-w-7xl mx-auto">
+        <MobileMembers members={members} loading={loading} onRefresh={refresh} />
+      </div>
+      <div className="hidden md:block max-w-7xl mx-auto space-y-6">
         
         <Link to="/admin" className="inline-flex items-center gap-1.5 min-h-[44px] text-sm font-bold text-amber-700 dark:text-amber-400">
           <ArrowLeft className="w-4 h-4" />

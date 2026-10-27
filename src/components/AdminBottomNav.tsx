@@ -1,13 +1,11 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Camera, LayoutDashboard, Settings, Users } from 'lucide-react';
+import { Images, LayoutDashboard, MoreHorizontal, Plus, Users } from 'lucide-react';
 
 /**
- * Mobile-only bottom tab bar for the admin section, so switching
- * between Dashboard / Members / Photos / Settings is one thumb-tap
- * instead of bouncing back through the dashboard. Renders nothing
- * outside /admin routes and nothing on md+ screens (desktop keeps
- * the dashboard cards + top navbar).
+ * Mobile-only bottom tab bar for the admin section:
+ * Home · Members · ＋ Add (centre) · Portraits · More.
+ * Renders nothing outside /admin routes and nothing on md+ screens.
  */
 export const AdminBottomNav: React.FC = () => {
   const location = useLocation();
@@ -16,12 +14,32 @@ export const AdminBottomNav: React.FC = () => {
     return null;
   }
 
-  const tabs = [
-    { name: 'Dashboard', path: '/admin', icon: LayoutDashboard, exact: true },
+  const sideTabs = [
+    { name: 'Home', path: '/admin', icon: LayoutDashboard, exact: true },
     { name: 'Members', path: '/admin/members', icon: Users, exact: false },
-    { name: 'Photos', path: '/admin/photos', icon: Camera, exact: false },
-    { name: 'Settings', path: '/admin/settings', icon: Settings, exact: false },
+    { name: 'Portraits', path: '/admin/photos', icon: Images, exact: false },
+    { name: 'More', path: '/admin/settings', icon: MoreHorizontal, exact: false },
   ];
+
+  const renderTab = (tab: (typeof sideTabs)[number]) => {
+    const isActive = tab.exact
+      ? location.pathname === tab.path
+      : location.pathname.startsWith(tab.path);
+    const Icon = tab.icon;
+    return (
+      <Link
+        key={tab.path}
+        to={tab.path}
+        className={`min-h-[60px] flex flex-col items-center justify-center gap-1 text-[11px] font-bold ${
+          isActive ? 'text-amber-700 dark:text-amber-400' : 'text-gray-500 dark:text-zinc-400'
+        }`}
+        aria-current={isActive ? 'page' : undefined}
+      >
+        <Icon className="w-6 h-6" />
+        {tab.name}
+      </Link>
+    );
+  };
 
   return (
     <nav
@@ -30,28 +48,21 @@ export const AdminBottomNav: React.FC = () => {
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       aria-label="Admin sections"
     >
-      <div className="grid grid-cols-4">
-        {tabs.map((tab) => {
-          const isActive = tab.exact
-            ? location.pathname === tab.path
-            : location.pathname.startsWith(tab.path);
-          const Icon = tab.icon;
-          return (
-            <Link
-              key={tab.path}
-              to={tab.path}
-              className={`min-h-[60px] flex flex-col items-center justify-center gap-1 text-[11px] font-bold ${
-                isActive
-                  ? 'text-amber-700 dark:text-amber-400'
-                  : 'text-gray-500 dark:text-zinc-400'
-              }`}
-              aria-current={isActive ? 'page' : undefined}
-            >
-              <Icon className="w-6 h-6" />
-              {tab.name}
-            </Link>
-          );
-        })}
+      <div className="grid grid-cols-5 items-end">
+        {renderTab(sideTabs[0])}
+        {renderTab(sideTabs[1])}
+        <Link
+          to="/admin/members?new=1"
+          className="flex flex-col items-center justify-center gap-1 text-[11px] font-bold text-gray-500 dark:text-zinc-400 min-h-[60px]"
+          aria-label="Add a new member"
+        >
+          <span className="w-12 h-12 -mt-6 bg-amber-600 text-white rounded-full flex items-center justify-center shadow-lg border-4 border-white dark:border-zinc-900">
+            <Plus className="w-6 h-6" />
+          </span>
+          Add
+        </Link>
+        {renderTab(sideTabs[2])}
+        {renderTab(sideTabs[3])}
       </div>
     </nav>
   );
