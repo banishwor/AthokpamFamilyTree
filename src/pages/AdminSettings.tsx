@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme, Theme } from '../context/ThemeContext';
+import { apiService } from '../services/api';
 import { Settings, Shield, Laptop, Sun, Moon, Database, HelpCircle, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -11,12 +12,20 @@ export const AdminSettings: React.FC = () => {
   // Local test states
   const [dbState, setDbState] = useState<'connected' | 'checking' | 'error'>('connected');
 
-  const handleTestDatabase = () => {
+  const handleTestDatabase = async () => {
     setDbState('checking');
-    setTimeout(() => {
+    try {
+      // Real check: fetch the member list from the Apps Script endpoint
+      const members = await apiService.getMembers();
+      if (!Array.isArray(members)) {
+        throw new Error('Unexpected response from the database endpoint.');
+      }
       setDbState('connected');
-      toast.success('Connection to Google Apps Script Database is active and stable!');
-    }, 1200);
+      toast.success(`Database connection is live — ${members.length} member records reached.`);
+    } catch (err) {
+      setDbState('error');
+      toast.error('Could not reach the database. Check the connection and try again.');
+    }
   };
 
   const themes: { id: Theme; label: string; desc: string; icon: React.ReactNode }[] = [
@@ -41,7 +50,7 @@ export const AdminSettings: React.FC = () => {
   ];
 
   return (
-    <div id="admin-settings-page" className="min-h-screen bg-gray-50/50 dark:bg-zinc-950 px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-300">
+    <div id="admin-settings-page" className="min-h-screen bg-gray-50/50 dark:bg-zinc-950 px-4 sm:px-6 lg:px-8 pt-8 pb-24 md:pb-8 transition-colors duration-300">
       <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
         
         {/* Header Title block */}
@@ -59,7 +68,7 @@ export const AdminSettings: React.FC = () => {
           <button
             id="btn-settings-back-dash"
             onClick={() => navigate('/admin')}
-            className="px-3.5 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-850 text-gray-700 dark:text-zinc-300 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm hover:bg-gray-50 transition-all self-start sm:self-center"
+            className="px-4 min-h-[44px] py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-850 text-gray-700 dark:text-zinc-300 rounded-xl text-sm font-bold flex items-center gap-1.5 shadow-sm hover:bg-gray-50 transition-all self-start sm:self-center"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             Back to Dashboard
@@ -156,7 +165,7 @@ export const AdminSettings: React.FC = () => {
                 <button
                   id="btn-test-db-connection"
                   onClick={handleTestDatabase}
-                  className="px-3 py-1.5 bg-white dark:bg-zinc-800 border border-gray-250 dark:border-zinc-700 rounded-lg font-bold text-[10px] uppercase hover:bg-gray-50 transition"
+                  className="px-4 min-h-[44px] py-2 bg-white dark:bg-zinc-800 border border-gray-250 dark:border-zinc-700 rounded-lg font-bold text-xs uppercase hover:bg-gray-50 transition"
                 >
                   Test Connection
                 </button>

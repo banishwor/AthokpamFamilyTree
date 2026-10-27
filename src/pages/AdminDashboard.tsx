@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import useMembers from '../hooks/useMembers';
+import { shortId } from '../components/SearchableSelect';
 import {
   Users,
   Image as ImageIcon,
@@ -68,7 +69,7 @@ export const AdminDashboard: React.FC = () => {
   ];
 
   return (
-    <div id="admin-dashboard-container" className="min-h-screen bg-gray-50/50 dark:bg-zinc-950 transition-all px-4 sm:px-6 lg:px-8 py-8">
+    <div id="admin-dashboard-container" className="min-h-screen bg-gray-50/50 dark:bg-zinc-950 transition-all px-4 sm:px-6 lg:px-8 pt-8 pb-24 md:pb-8">
       <div className="max-w-7xl mx-auto space-y-8 animate-fade-in">
         
         {/* Header Ribbon section */}
@@ -91,7 +92,7 @@ export const AdminDashboard: React.FC = () => {
 
         {/* 1. Metrics Grid */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-pulse">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-pulse">
             {[1, 2, 3, 4].map((id) => (
               <div key={id} className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-850 h-24 rounded-2xl" />
             ))}
@@ -101,9 +102,9 @@ export const AdminDashboard: React.FC = () => {
             {error}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Metric 1 */}
-            <div id="metric-total-members" className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-850 p-5 rounded-2xl shadow-sm hover:shadow-md transition flex items-center justify-between">
+            <div id="metric-total-members" className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-850 p-4 sm:p-5 rounded-2xl shadow-sm hover:shadow-md transition flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Total Registered</span>
                 <span className="text-2xl font-black text-gray-900 dark:text-white block mt-1 tracking-tight">{metrics.total}</span>
@@ -114,7 +115,7 @@ export const AdminDashboard: React.FC = () => {
             </div>
 
             {/* Metric 2 */}
-            <div id="metric-total-photos" className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-850 p-5 rounded-2xl shadow-sm hover:shadow-md transition flex items-center justify-between">
+            <div id="metric-total-photos" className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-850 p-4 sm:p-5 rounded-2xl shadow-sm hover:shadow-md transition flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Linked Portraits</span>
                 <span className="text-2xl font-black text-gray-900 dark:text-white block mt-1 tracking-tight">{metrics.photos}</span>
@@ -125,7 +126,7 @@ export const AdminDashboard: React.FC = () => {
             </div>
 
             {/* Metric 3 */}
-            <div id="metric-males-count" className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-850 p-5 rounded-2xl shadow-sm hover:shadow-md transition flex items-center justify-between">
+            <div id="metric-males-count" className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-850 p-4 sm:p-5 rounded-2xl shadow-sm hover:shadow-md transition flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Male Lineage</span>
                 <span className="text-2xl font-black text-gray-900 dark:text-white block mt-1 tracking-tight">{metrics.males}</span>
@@ -136,7 +137,7 @@ export const AdminDashboard: React.FC = () => {
             </div>
 
             {/* Metric 4 */}
-            <div id="metric-females-count" className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-850 p-5 rounded-2xl shadow-sm hover:shadow-md transition flex items-center justify-between">
+            <div id="metric-females-count" className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-850 p-4 sm:p-5 rounded-2xl shadow-sm hover:shadow-md transition flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Female Lineage</span>
                 <span className="text-2xl font-black text-gray-900 dark:text-white block mt-1 tracking-tight">{metrics.females}</span>
@@ -210,7 +211,34 @@ export const AdminDashboard: React.FC = () => {
                 No lineage records exist yet. Use "Manage Members" to create the first of the Athokpam tree.
               </div>
             ) : (
-              <div className="overflow-x-auto">
+              <>
+              <div className="md:hidden space-y-2">
+                {recentMembers.map((m) => (
+                  <div key={m.id} className="flex items-center gap-3 bg-gray-50/60 dark:bg-zinc-800/40 rounded-2xl px-4 py-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-bold text-gray-900 dark:text-zinc-100 truncate">{m.firstName} {m.lastName}</p>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {m.gender === 'F' ? 'Female' : 'Male'}
+                        {m.birthDate ? ` · Born ${new Date(m.birthDate).getFullYear()}` : ''}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => navigate(`/admin/members?edit=${m.id}`)}
+                      className="min-h-[44px] px-3 flex items-center text-sm font-bold text-blue-600 dark:text-blue-400"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => navigate(`/admin/photos?memberId=${m.id}`)}
+                      className="min-h-[44px] px-3 flex items-center text-sm font-bold text-indigo-600 dark:text-indigo-400"
+                    >
+                      Photo
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-left border-collapse min-w-[500px] text-xs">
                   <thead>
                     <tr className="border-b border-gray-100 dark:border-zinc-805 text-gray-400 uppercase font-bold text-[10px] tracking-wide">
@@ -229,7 +257,7 @@ export const AdminDashboard: React.FC = () => {
                           <td className="py-3.5 px-3 font-semibold text-gray-900 dark:text-zinc-100">
                             {m.firstName} {m.lastName}
                           </td>
-                          <td className="py-3.5 px-3 text-mono font-bold text-gray-400 dark:text-zinc-500">#{m.id}</td>
+                          <td className="py-3.5 px-3 text-mono font-bold text-gray-400 dark:text-zinc-500" title={String(m.id)}>{shortId(m.id)}</td>
                           <td className="py-3.5 px-3">
                             <span className={`px-2 py-0.5 rounded-full text-[9px] uppercase font-bold tracking-wider ${
                               m.gender === 'F' ? 'bg-pink-50 text-pink-600 dark:bg-pink-950/20 dark:text-pink-400' : 'bg-amber-50 text-amber-700 dark:bg-amber-955/20 dark:text-amber-400'
@@ -243,7 +271,7 @@ export const AdminDashboard: React.FC = () => {
                               <button
                                 id={`shortcut-edit-btn-${m.id}`}
                                 onClick={() => navigate(`/admin/members?edit=${m.id}`)}
-                                className="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline"
+                                className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center min-h-[44px] px-1"
                               >
                                 Edit Profile
                               </button>
@@ -251,7 +279,7 @@ export const AdminDashboard: React.FC = () => {
                               <button
                                 id={`shortcut-upload-btn-${m.id}`}
                                 onClick={() => navigate(`/admin/photos?memberId=${m.id}`)}
-                                className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
+                                className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center min-h-[44px] px-1"
                               >
                                 Photo Studio
                               </button>
@@ -263,6 +291,7 @@ export const AdminDashboard: React.FC = () => {
                   </tbody>
                 </table>
               </div>
+              </>
             )}
           </div>
 

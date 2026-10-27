@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { apiService } from '../services/api';
 import { Member } from '../types';
+import SearchableSelect from './SearchableSelect';
 import { Camera, Image as ImageIcon, Loader2, CheckCircle2, UserCheck, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -176,27 +177,22 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
             <span>Loading members list...</span>
           </div>
         ) : (
-          <select
+          <SearchableSelect
             id="upload-member-select"
             value={selectedMemberId}
-            onChange={(e) => setSelectedMemberId(e.target.value)}
+            onChange={setSelectedMemberId}
+            emptyLabel="-- Choose Member to Update --"
+            placeholder="Choose member to update"
             disabled={!!initialMemberId}
-            className="w-full px-4 py-2.5 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm font-semibold text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 disabled:opacity-75 transition-all"
-          >
-            <option value="">-- Choose Member to Update --</option>
-            {members.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.firstName} {m.middleName ? `${m.middleName} ` : ''}{m.lastName} (ID: {m.id})
-              </option>
-            ))}
-          </select>
+            options={members.map((m) => ({ id: String(m.id), name: `${m.firstName} ${m.middleName ? `${m.middleName} ` : ''}${m.lastName}` }))}
+          />
         )}
       </div>
 
       {/* 2. Drag & Drop File Container */}
       <div id="image-dropzone-block" className="space-y-2">
         <label className="text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wider block">
-          2. Drag & Drop or Choose Image
+          2. Choose Image
         </label>
 
         <div
@@ -220,18 +216,21 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
                   alt="Selected Preview"
                   className="w-full h-full object-cover"
                 />
-                <button
-                  id="btn-remove-selected-photo"
-                  type="button"
-                  onClick={() => {
-                    setSelectedFile(null);
-                    setPreviewUrl(null);
-                    setBase64String(null);
-                  }}
-                  className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-bold transition-opacity rounded-full"
+                <label
+                  htmlFor="change-photo-input"
+                  className="absolute inset-0 flex items-end justify-center cursor-pointer"
                 >
-                  Change Image
-                </button>
+                  <span className="mb-2 px-3 py-1.5 bg-black/65 text-white text-xs font-bold rounded-full">
+                    Change Image
+                  </span>
+                  <input
+                    id="change-photo-input"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileInput}
+                    className="hidden"
+                  />
+                </label>
               </div>
               <div className="text-xs text-gray-500 dark:text-zinc-400">
                 <span className="font-semibold text-gray-700 dark:text-zinc-200 block">
@@ -246,18 +245,20 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
                 <Camera className="w-8 h-8" />
               </div>
               <div className="text-sm font-semibold text-gray-600 dark:text-zinc-300">
-                Drag and drop your image here, or{' '}
-                <label className="text-amber-600 dark:text-amber-400 hover:underline cursor-pointer">
-                  browse files
-                  <input
-                    id="hidden-photo-input"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileInput}
-                    className="hidden"
-                  />
-                </label>
+                <span className="hidden sm:inline">Drag and drop your image here, or</span>
+                <span className="sm:hidden">Take a photo or pick one from your gallery</span>
               </div>
+              <label className="inline-flex items-center justify-center gap-2 min-h-[52px] px-6 bg-amber-600 hover:bg-amber-700 text-white text-base font-extrabold rounded-xl cursor-pointer shadow-md">
+                <Camera className="w-5 h-5" />
+                Choose Photo
+                <input
+                  id="hidden-photo-input"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileInput}
+                  className="hidden"
+                />
+              </label>
               <div className="text-[11px] text-gray-400 dark:text-zinc-500">
                 Supports JPG, JPEG, and PNG files up to 3MB
               </div>
@@ -271,7 +272,7 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
         id="btn-photo-upload-submit"
         type="submit"
         disabled={uploading || !selectedMemberId || !base64String}
-        className="w-full py-3 bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600 disabled:bg-gray-200 dark:disabled:bg-zinc-800 disabled:text-gray-400 dark:disabled:text-zinc-600 text-white font-extrabold rounded-xl transition-all duration-300 shadow-md flex items-center justify-center gap-2"
+        className="w-full min-h-[52px] py-3.5 text-base bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600 disabled:bg-gray-200 dark:disabled:bg-zinc-800 disabled:text-gray-400 dark:disabled:text-zinc-600 text-white font-extrabold rounded-xl transition-all duration-300 shadow-md flex items-center justify-center gap-2"
       >
         {uploading ? (
           <>

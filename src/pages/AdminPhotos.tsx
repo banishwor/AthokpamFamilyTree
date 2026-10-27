@@ -13,7 +13,7 @@ export const AdminPhotos: React.FC = () => {
   }, [searchParams]);
 
   return (
-    <div id="admin-photos-page" className="min-h-screen bg-gray-50/50 dark:bg-zinc-950 px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-300">
+    <div id="admin-photos-page" className="min-h-screen bg-gray-50/50 dark:bg-zinc-950 px-4 sm:px-6 lg:px-8 pt-8 pb-24 md:pb-8 transition-colors duration-300">
       <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
         
         {/* Navigation back and title */}
@@ -31,7 +31,7 @@ export const AdminPhotos: React.FC = () => {
           <button
             id="btn-photos-back-dash"
             onClick={() => navigate('/admin')}
-            className="px-3.5 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 rounded-xl text-xs font-bold flex items-center gap-1 shadow-sm hover:bg-gray-50 transition-all self-start sm:self-center"
+            className="px-4 min-h-[44px] py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 rounded-xl text-sm font-bold flex items-center gap-1.5 shadow-sm hover:bg-gray-50 transition-all self-start sm:self-center"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             Back to Dashboard

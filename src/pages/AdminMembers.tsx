@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { apiService } from '../services/api';
 import useMembers from '../hooks/useMembers';
 import { Member } from '../types';
 import { getDirectPhotoUrl } from '../utils';
+import SearchableSelect, { shortId } from '../components/SearchableSelect';
 import {
   Plus,
   Search,
@@ -15,7 +16,8 @@ import {
   UserPlus,
   AlertTriangle,
   User,
-  GitPullRequest
+  GitPullRequest,
+  ArrowLeft
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -273,9 +275,14 @@ export const AdminMembers: React.FC = () => {
   }, [members, selectedMember]);
 
   return (
-    <div id="admin-members-page" className="min-h-screen bg-gray-50/50 dark:bg-zinc-950 transition-colors duration-300 px-4 sm:px-6 lg:px-8 py-8">
+    <div id="admin-members-page" className="min-h-screen bg-gray-50/50 dark:bg-zinc-950 transition-colors duration-300 px-4 sm:px-6 lg:px-8 pt-8 pb-24 md:pb-8">
       <div className="max-w-7xl mx-auto space-y-6">
         
+        <Link to="/admin" className="inline-flex items-center gap-1.5 min-h-[44px] text-sm font-bold text-amber-700 dark:text-amber-400">
+          <ArrowLeft className="w-4 h-4" />
+          Back to Dashboard
+        </Link>
+
         {/* Header Ribbon bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -291,7 +298,7 @@ export const AdminMembers: React.FC = () => {
           <button
             id="btn-admin-add-member"
             onClick={handleOpenAdd}
-            className="px-4.5 py-2 bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600 text-white font-extrabold text-xs rounded-xl flex items-center gap-1.5 shadow-md active:scale-95 transition-transform self-start sm:self-center"
+            className="px-5 min-h-[48px] py-2.5 bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600 text-white font-extrabold text-sm rounded-xl flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-transform w-full sm:w-auto"
           >
             <Plus className="w-4 h-4" />
             Add Family Member
@@ -307,7 +314,7 @@ export const AdminMembers: React.FC = () => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Filter database list by name, occupation, address or ID..."
-            className="w-full bg-transparent border-none text-xs text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-0 font-semibold"
+            className="w-full min-h-[48px] bg-transparent border-none text-base text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-0 font-semibold"
           />
         </div>
 
@@ -326,7 +333,60 @@ export const AdminMembers: React.FC = () => {
             No family records matching query terms.
           </div>
         ) : (
-          <div className="bg-white dark:bg-zinc-900 border border-gray-150 dark:border-zinc-850/80 rounded-3xl overflow-hidden shadow-sm">
+          <>
+          {/* Mobile: member cards (the wide table is desktop-only) */}
+          <div className="md:hidden space-y-3">
+            {filteredMembers.map((m) => (
+              <div key={m.id} id={`card-admin-member-${m.id}`} className="bg-white dark:bg-zinc-900 border border-gray-150 dark:border-zinc-850/80 rounded-2xl p-4 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 flex items-center justify-center flex-shrink-0">
+                    {m.photoUrl ? (
+                      <img src={getDirectPhotoUrl(m.photoUrl)} alt={m.firstName} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                    ) : (
+                      <User className="w-6 h-6 text-gray-300" />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-base font-bold text-gray-950 dark:text-zinc-100 truncate">
+                      {m.firstName} {m.middleName ? `${m.middleName} ` : ''}{m.lastName}
+                    </p>
+                    <p className="flex items-center gap-2 mt-0.5">
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] uppercase font-black ${
+                        m.gender === 'F' ? 'bg-pink-50 text-pink-600 dark:bg-pink-955/20 dark:text-pink-400' : 'bg-amber-50 text-amber-700 dark:bg-amber-955/20 dark:text-amber-400'
+                      }`}>
+                        {m.gender === 'F' ? 'Female' : 'Male'}
+                      </span>
+                      <span className="font-mono text-xs text-gray-400">{shortId(m.id)}</span>
+                    </p>
+                  </div>
+                </div>
+                {(m.occupation || m.address) && (
+                  <div className="mt-3 space-y-0.5 text-sm text-gray-500 dark:text-zinc-400">
+                    {m.occupation && <p>{m.occupation}</p>}
+                    {m.address && <p>{m.address}</p>}
+                  </div>
+                )}
+                <div className="mt-4 flex gap-3">
+                  <button
+                    onClick={() => handleOpenForm(m)}
+                    className="flex-1 min-h-[48px] bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 font-bold rounded-xl flex items-center justify-center gap-2 text-sm"
+                  >
+                    <Edit className="w-5 h-5" />
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => setDeleteCandidate(m)}
+                    className="min-h-[48px] px-5 bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 font-bold rounded-xl flex items-center justify-center gap-2 text-sm"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="hidden md:block bg-white dark:bg-zinc-900 border border-gray-150 dark:border-zinc-850/80 rounded-3xl overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs min-w-[750px]">
                 <thead>
@@ -343,7 +403,7 @@ export const AdminMembers: React.FC = () => {
                 <tbody className="divide-y divide-gray-100 dark:divide-zinc-850 font-medium text-gray-700 dark:text-zinc-300">
                   {filteredMembers.map((m) => (
                     <tr key={m.id} id={`row-admin-member-${m.id}`} className="hover:bg-gray-50/50 dark:hover:bg-zinc-850/20 transition-all">
-                      <td className="py-3 px-4 text-mono font-bold text-gray-450 dark:text-zinc-550">#{m.id}</td>
+                      <td className="py-3 px-4 text-mono font-bold text-gray-450 dark:text-zinc-550" title={String(m.id)}>{shortId(m.id)}</td>
                       <td className="py-3 px-4">
                         <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-50 border border-gray-100 flex items-center justify-center">
                           {m.photoUrl ? (
@@ -370,7 +430,7 @@ export const AdminMembers: React.FC = () => {
                           <button
                             id={`btn-edit-${m.id}`}
                             onClick={() => handleOpenForm(m)}
-                            className="p-1.5 hover:bg-gray-150 dark:hover:bg-zinc-800 text-blue-600 dark:text-blue-400 rounded-lg"
+                            className="p-2.5 hover:bg-gray-150 dark:hover:bg-zinc-800 text-blue-600 dark:text-blue-400 rounded-lg"
                             title="Edit Record details"
                           >
                             <Edit className="w-4 h-4" />
@@ -378,7 +438,7 @@ export const AdminMembers: React.FC = () => {
                           <button
                             id={`btn-delete-${m.id}`}
                             onClick={() => setDeleteCandidate(m)}
-                            className="p-1.5 hover:bg-gray-150 dark:hover:bg-zinc-800 text-red-600 dark:text-red-400 rounded-lg"
+                            className="p-2.5 hover:bg-gray-150 dark:hover:bg-zinc-800 text-red-600 dark:text-red-400 rounded-lg"
                             title="Delete Record"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -391,12 +451,13 @@ export const AdminMembers: React.FC = () => {
               </table>
             </div>
           </div>
+          </>
         )}
 
         {/* 1. Modal Form: Add or Edit Member */}
         {isModalOpen && (
-          <div id="member-modal-overlay" className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-            <div id="member-modal" className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col scale-100 animate-zoom-in">
+          <div id="member-modal-overlay" className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center sm:p-4">
+            <div id="member-modal" className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl w-full max-w-2xl max-h-[92dvh] flex flex-col scale-100 animate-zoom-in">
               {/* Header */}
               <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-805 bg-gray-50/50 dark:bg-zinc-950">
                 <h2 className="text-sm font-black text-gray-990 dark:text-white uppercase tracking-wider flex items-center gap-2">
@@ -406,14 +467,15 @@ export const AdminMembers: React.FC = () => {
                 <button
                   id="btn-close-member-modal"
                   onClick={() => setIsModalOpen(false)}
-                  className="p-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-full"
+                  className="min-w-[44px] min-h-[44px] flex items-center justify-center bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-full"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               {/* Form Body */}
-              <form onSubmit={handleFormSubmit} className="flex-1 overflow-y-auto p-6 space-y-5 text-xs text-gray-700 dark:text-zinc-300">
+              <form onSubmit={handleFormSubmit} className="flex-1 flex flex-col min-h-0 text-sm text-gray-700 dark:text-zinc-300">
+              <div className="flex-1 overflow-y-auto p-5 sm:p-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   
                   {/* First Name */}
@@ -426,7 +488,7 @@ export const AdminMembers: React.FC = () => {
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
                       placeholder="e.g. John"
-                      className="w-full px-3 py-2 bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl"
+                      className="w-full px-3.5 min-h-[48px] py-2.5 text-base bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl"
                     />
                   </div>
 
@@ -439,7 +501,7 @@ export const AdminMembers: React.FC = () => {
                       value={middleName}
                       onChange={(e) => setMiddleName(e.target.value)}
                       placeholder="e.g. Bahadur"
-                      className="w-full px-3 py-2 bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl"
+                      className="w-full px-3.5 min-h-[48px] py-2.5 text-base bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl"
                     />
                   </div>
 
@@ -453,7 +515,7 @@ export const AdminMembers: React.FC = () => {
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
                       placeholder="e.g. Athokpam"
-                      className="w-full px-3 py-2 bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl"
+                      className="w-full px-3.5 min-h-[48px] py-2.5 text-base bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl"
                     />
                   </div>
 
@@ -464,7 +526,7 @@ export const AdminMembers: React.FC = () => {
                       id="form-select-gender"
                       value={gender}
                       onChange={(e) => setGender(e.target.value)}
-                      className="w-full px-3 py-2 bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl"
+                      className="w-full px-3.5 min-h-[48px] py-2.5 text-base bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl"
                     >
                       <option value="M">Male</option>
                       <option value="F">Female</option>
@@ -476,63 +538,44 @@ export const AdminMembers: React.FC = () => {
                   {/* Parents Section mapping selection */}
                   <div className="space-y-1">
                     <label className="font-extrabold text-[#474542] dark:text-zinc-400 uppercase tracking-wider">Father Record</label>
-                    <select
+                    <SearchableSelect
                       id="form-select-father"
                       value={fatherId}
-                      onChange={(e) => setFatherId(e.target.value)}
-                      className="w-full px-3 py-2 bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl"
-                    >
-                      <option value="">-- No Father linked --</option>
-                      {candidateRelations
+                      onChange={setFatherId}
+                      emptyLabel="-- No Father linked --"
+                      placeholder="Select father"
+                      options={candidateRelations
                         .filter((m) => m.gender === 'M')
-                        .map((m) => (
-                          <option key={m.id} value={m.id}>
-                            {m.firstName} {m.lastName} (#{m.id})
-                          </option>
-                        ))}
-                    </select>
+                        .map((m) => ({ id: String(m.id), name: `${m.firstName} ${m.lastName}` }))}
+                    />
                   </div>
 
                   <div className="space-y-1">
                     <label className="font-extrabold text-[#474542] dark:text-zinc-400 uppercase tracking-wider">Mother Record</label>
-                    <select
+                    <SearchableSelect
                       id="form-select-mother"
                       value={motherId}
-                      onChange={(e) => setMotherId(e.target.value)}
-                      className="w-full px-3 py-2 bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl"
-                    >
-                      <option value="">-- No Mother linked --</option>
-                      {candidateRelations
+                      onChange={setMotherId}
+                      emptyLabel="-- No Mother linked --"
+                      placeholder="Select mother"
+                      options={candidateRelations
                         .filter((m) => m.gender === 'F')
-                        .map((m) => (
-                          <option key={m.id} value={m.id}>
-                            {m.firstName} {m.lastName} (#{m.id})
-                          </option>
-                        ))}
-                    </select>
+                        .map((m) => ({ id: String(m.id), name: `${m.firstName} ${m.lastName}` }))}
+                    />
                   </div>
 
                   <div className="space-y-1">
                     <label className="font-extrabold text-[#474542] dark:text-zinc-400 uppercase tracking-wider">Spouse Record</label>
-                    <select
+                    <SearchableSelect
                       id="form-select-spouse"
                       value={spouseId}
-                      onChange={(e) => setSpouseId(e.target.value)}
-                      className="w-full px-3 py-2 bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl"
-                    >
-                      <option value="">-- No Spouse linked --</option>
-                      {candidateRelations
-                        .filter((m) => {
-                          if (gender === 'M') return m.gender === 'F';
-                          if (gender === 'F') return m.gender === 'M';
-                          return true;
-                        })
-                        .map((m) => (
-                          <option key={m.id} value={m.id}>
-                            {m.firstName} {m.lastName} (#{m.id})
-                          </option>
-                        ))}
-                    </select>
+                      onChange={setSpouseId}
+                      emptyLabel="-- No Spouse linked --"
+                      placeholder="Select spouse"
+                      options={candidateRelations
+                        .filter((m) => gender === 'M' ? m.gender === 'F' : gender === 'F' ? m.gender === 'M' : true)
+                        .map((m) => ({ id: String(m.id), name: `${m.firstName} ${m.lastName}` }))}
+                    />
                   </div>
 
                   {/* Photo URL (Manual input fallback, otherwise they use the upload photo portal) */}
@@ -544,7 +587,7 @@ export const AdminMembers: React.FC = () => {
                       value={photoUrl}
                       onChange={(e) => setPhotoUrl(e.target.value)}
                       placeholder="Or update via Photo Studio"
-                      className="w-full px-3 py-2 bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl"
+                      className="w-full px-3.5 min-h-[48px] py-2.5 text-base bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl"
                     />
                   </div>
 
@@ -558,7 +601,7 @@ export const AdminMembers: React.FC = () => {
                       type="date"
                       value={birthDate}
                       onChange={(e) => setBirthDate(e.target.value)}
-                      className="w-full px-3 py-2 bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl"
+                      className="w-full px-3.5 min-h-[48px] py-2.5 text-base bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl"
                     />
                   </div>
 
@@ -570,7 +613,7 @@ export const AdminMembers: React.FC = () => {
                       type="date"
                       value={deathDate}
                       onChange={(e) => setDeathDate(e.target.value)}
-                      className="w-full px-3 py-2 bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl"
+                      className="w-full px-3.5 min-h-[48px] py-2.5 text-base bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl"
                     />
                   </div>
 
@@ -583,7 +626,7 @@ export const AdminMembers: React.FC = () => {
                       value={occupation}
                       onChange={(e) => setOccupation(e.target.value)}
                       placeholder="e.g. Civil Engineer"
-                      className="w-full px-3 py-2 bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl"
+                      className="w-full px-3.5 min-h-[48px] py-2.5 text-base bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl"
                     />
                   </div>
 
@@ -596,7 +639,7 @@ export const AdminMembers: React.FC = () => {
                       value={education}
                       onChange={(e) => setEducation(e.target.value)}
                       placeholder="e.g. B.Tech in Biotechnology"
-                      className="w-full px-3 py-2 bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl"
+                      className="w-full px-3.5 min-h-[48px] py-2.5 text-base bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl"
                     />
                   </div>
 
@@ -609,7 +652,7 @@ export const AdminMembers: React.FC = () => {
                       value={address}
                       onChange={(e) => setAddress(e.target.value)}
                       placeholder="e.g. Imphal, Manipur, India"
-                      className="w-full px-3 py-2 bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl"
+                      className="w-full px-3.5 min-h-[48px] py-2.5 text-base bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl"
                     />
                   </div>
 
@@ -622,18 +665,20 @@ export const AdminMembers: React.FC = () => {
                       onChange={(e) => setBio(e.target.value)}
                       placeholder="Include achievements, outstanding life history logs..."
                       rows={4}
-                      className="w-full px-3 py-2 bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl font-sans"
+                      className="w-full px-3.5 min-h-[48px] py-2.5 text-base bg-gray-55 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl font-sans"
                     />
                   </div>
                 </div>
 
-                {/* Submit Panel */}
-                <div className="pt-4 border-t border-gray-100 dark:border-zinc-805 flex justify-end gap-3.5">
+              </div>
+
+                {/* Submit Panel — sticky footer, always reachable on phones */}
+                <div className="shrink-0 border-t border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-5 sm:px-6 py-4 flex gap-3">
                   <button
                     id="btn-cancel-modal"
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2 bg-gray-105 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-750 font-bold rounded-xl"
+                    className="px-5 min-h-[48px] py-2.5 bg-gray-105 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-750 font-bold rounded-xl text-sm flex items-center justify-center"
                   >
                     Cancel
                   </button>
@@ -641,7 +686,7 @@ export const AdminMembers: React.FC = () => {
                     id="btn-submit-modal"
                     type="submit"
                     disabled={saving}
-                    className="px-6 py-2 bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600 disabled:opacity-50 text-white font-extrabold rounded-xl shadow-md flex items-center gap-1.5"
+                    className="flex-1 sm:flex-none justify-center px-6 min-h-[48px] py-2.5 bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600 disabled:opacity-50 text-white font-extrabold rounded-xl shadow-md flex items-center gap-1.5 text-sm"
                   >
                     {saving ? (
                       <>
@@ -663,7 +708,7 @@ export const AdminMembers: React.FC = () => {
 
         {/* 2. Confirmation Dialog: Delete Member */}
         {deleteCandidate && (
-          <div id="delete-modal-overlay" className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div id="delete-modal-overlay" className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center sm:p-4">
             <div id="delete-modal" className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 p-6 rounded-3xl max-w-sm w-full shadow-2xl space-y-4 text-center text-xs text-gray-700 dark:text-zinc-300">
               <div className="mx-auto w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center">
                 <AlertTriangle className="w-6 h-6" />
@@ -684,7 +729,7 @@ export const AdminMembers: React.FC = () => {
                   id="btn-cancel-delete"
                   disabled={deleting}
                   onClick={() => setDeleteCandidate(null)}
-                  className="px-4 py-2 bg-gray-105 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-750 font-bold rounded-xl"
+                  className="px-5 min-h-[48px] py-2.5 bg-gray-105 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-750 font-bold rounded-xl text-sm flex items-center justify-center"
                 >
                   Cancel
                 </button>
@@ -692,7 +737,7 @@ export const AdminMembers: React.FC = () => {
                   id="btn-confirm-delete"
                   disabled={deleting}
                   onClick={handleDeleteMember}
-                  className="px-4 py-2 bg-red-65 hover:bg-red-700 text-white font-extrabold rounded-xl shadow-md flex items-center gap-1"
+                  className="px-5 min-h-[48px] py-2.5 bg-red-65 hover:bg-red-700 text-white font-extrabold rounded-xl shadow-md flex items-center gap-1 text-sm"
                 >
                   {deleting ? (
                     <>

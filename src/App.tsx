@@ -7,6 +7,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminBottomNav from './components/AdminBottomNav';
 
 // Public pages
 import Home from './pages/Home';
@@ -60,6 +61,7 @@ export default function App() {
           </main>
 
           <Footer />
+          <AdminBottomNav />
         </div>
         
         {/* React Hot Toast configurations */}

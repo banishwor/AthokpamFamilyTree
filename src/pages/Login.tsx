@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiService } from '../services/api';
-import { Shield, Lock, User, Loader2, Sparkles } from 'lucide-react';
+import { Shield, Lock, User, Loader2, Sparkles, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   // Redirect if already authenticated
@@ -92,7 +93,7 @@ export const Login: React.FC = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Enter admin username"
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700/80 rounded-xl text-xs font-semibold placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/10 transition-all font-sans"
+                className="w-full pl-11 pr-4 min-h-[52px] py-3 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700/80 rounded-xl text-base font-semibold placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/10 transition-all font-sans"
               />
             </div>
           </div>
@@ -106,13 +107,21 @@ export const Login: React.FC = () => {
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 id="login-password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password key"
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700/80 rounded-xl text-xs font-semibold placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/10 transition-all font-sans"
+                className="w-full pl-11 pr-12 min-h-[52px] py-3 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700/80 rounded-xl text-base font-semibold placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/10 transition-all font-sans"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-1 top-1/2 -translate-y-1/2 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-400"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
             </div>
           </div>
 
@@ -121,7 +130,7 @@ export const Login: React.FC = () => {
             id="btn-login-submit"
             type="submit"
             disabled={loading}
-            className="w-full py-3 mt-4 bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600 disabled:opacity-50 text-white font-extrabold rounded-xl text-xs transition-all tracking-wider uppercase flex items-center justify-center gap-1.5 shadow-md active:scale-[0.98]"
+            className="w-full min-h-[52px] py-3.5 mt-4 bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600 disabled:opacity-50 text-white font-extrabold rounded-xl text-sm transition-all tracking-wider uppercase flex items-center justify-center gap-1.5 shadow-md active:scale-[0.98]"
           >
             {loading ? (
               <>
