@@ -30,7 +30,7 @@ import AdminSettings from './pages/AdminSettings';
  * no global header or footer, like a native app. Desktop and the
  * public pages keep the full site chrome.
  */
-const APP_ROUTES_ON_MOBILE = ['/admin', '/quick-update', '/login'];
+const APP_ROUTES_ON_MOBILE = ['/admin', '/quick-update', '/login', '/tree'];
 
 const SiteChrome: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();

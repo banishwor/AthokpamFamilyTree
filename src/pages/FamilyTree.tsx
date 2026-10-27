@@ -8,7 +8,8 @@ import SearchableSelect from '../components/SearchableSelect';
 import { Member } from '../types';
 import { fullName, sortedByName } from '../utils/memberSave';
 import toast from 'react-hot-toast';
-import { Loader2, GitMerge, RefreshCw, ZoomIn, ZoomOut, Info, Maximize2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Loader2, GitMerge, RefreshCw, ZoomIn, ZoomOut, Info, Maximize2, Home } from 'lucide-react';
 
 // Custom SVG path drawing function to connect children from the bottom-middle of parents' cards
 const customPathFunc = (link: any) => {
@@ -176,10 +177,10 @@ export const FamilyTree: React.FC = () => {
   };
 
   return (
-    <div id="family-tree-page" className="min-h-screen bg-gray-50/50 dark:bg-zinc-950 px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto flex flex-col h-[calc(100vh-140px)]">
+    <div id="family-tree-page" className="h-[100dvh] md:h-auto md:min-h-screen bg-gray-50/50 dark:bg-zinc-950 px-3 py-3 sm:px-6 lg:px-8 md:py-8 transition-colors duration-300">
+      <div className="max-w-7xl mx-auto flex flex-col h-full md:h-[calc(100vh-140px)]">
         {/* Header Block */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div className="hidden md:flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-2">
               <GitMerge className="w-6 h-6 text-amber-600 dark:text-amber-500" />
@@ -211,8 +212,50 @@ export const FamilyTree: React.FC = () => {
         </div>
 
 
-        {/* Person search */}
-        <div className="mb-4 max-w-md">
+        {/* Mobile slim toolbar: home, search, recenter, refresh.
+            No zoom buttons on touch screens (pinch handles it) and
+            no title block — every pixel goes to the tree. */}
+        <div className="flex md:hidden items-center gap-2 mb-2">
+          <Link
+            to="/"
+            aria-label="Back to home"
+            className="w-11 h-11 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-300 shadow-sm"
+          >
+            <Home className="w-5 h-5" />
+          </Link>
+          <div className="flex-1 min-w-0">
+            <SearchableSelect
+              id="tree-person-search-mobile"
+              value={searchId}
+              onChange={(id) => {
+                setSearchId(id);
+                if (id) focusMember(id);
+              }}
+              options={searchOptions}
+              emptyLabel="-- Find a person in the tree --"
+              placeholder="Find a person in the tree"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={handleRecenter}
+            aria-label="Recenter tree"
+            className="w-11 h-11 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-300 shadow-sm"
+          >
+            <Maximize2 className="w-5 h-5" />
+          </button>
+          <button
+            type="button"
+            onClick={refresh}
+            aria-label="Refresh tree data"
+            className="w-11 h-11 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-300 shadow-sm"
+          >
+            <RefreshCw className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Person search (desktop) */}
+        <div className="hidden md:block mb-4 max-w-md">
           <SearchableSelect
             id="tree-person-search"
             value={searchId}
@@ -235,7 +278,7 @@ export const FamilyTree: React.FC = () => {
         <div
           ref={containerRef}
           id="tree-canvas-container"
-          className="flex-1 min-h-[400px] border border-gray-200 dark:border-white/5 rounded-2xl bg-white dark:bg-zinc-900 sophisticated-grid-bg shadow-inner relative overflow-hidden flex flex-col items-stretch justify-stretch"
+          className="flex-1 min-h-0 md:min-h-[400px] border border-gray-200 dark:border-white/5 rounded-2xl bg-white dark:bg-zinc-900 sophisticated-grid-bg shadow-inner relative overflow-hidden flex flex-col items-stretch justify-stretch"
         >
           {loading ? (
             <div className="absolute inset-0 bg-white/60 dark:bg-zinc-900/60 backdrop-blur-xs flex flex-col items-center justify-center gap-3 z-30">
@@ -283,12 +326,13 @@ export const FamilyTree: React.FC = () => {
                     toggleNode={rd3tProps.toggleNode}
                     isAdmin={isAdmin}
                     highlightId={highlightId}
+                    zoomLevel={zoom}
                     onEditMember={(id) => setEditingId(id)}
                   />
                 )}
               />
               {/* Floating zoom controls */}
-              <div className="absolute bottom-3 right-3 z-20 flex flex-col items-center gap-1 bg-white/95 dark:bg-zinc-900/95 backdrop-blur border border-gray-200 dark:border-zinc-800 rounded-2xl shadow-lg p-1">
+              <div className="absolute bottom-3 right-3 z-20 hidden md:flex flex-col items-center gap-1 bg-white/95 dark:bg-zinc-900/95 backdrop-blur border border-gray-200 dark:border-zinc-800 rounded-2xl shadow-lg p-1">
                 <button
                   type="button"
                   onClick={() => zoomBy(1.25)}

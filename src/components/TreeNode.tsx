@@ -19,9 +19,11 @@ interface TreeNodeProps {
   highlightId?: string | null;
   /** Called when an admin taps the pencil on a person's card */
   onEditMember?: (memberId: string) => void;
+  /** Current tree zoom (0.2–2). EXPAND/COLLAPSE labels hide below 0.6. */
+  zoomLevel?: number;
 }
 
-export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode, isAdmin, highlightId, onEditMember }) => {
+export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode, isAdmin, highlightId, onEditMember, zoomLevel }) => {
   const navigate = useNavigate();
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
@@ -235,7 +237,7 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode, isAdm
         className={`cursor-pointer hover:scale-120 transition-transform shadow-md stroke-2 ${isDark ? 'stroke-zinc-950' : 'stroke-white'}`}
         onClick={toggleNode}
       />
-      {hasChildren && (
+      {hasChildren && (zoomLevel ?? 1) >= 0.6 && (
         <text
           y="-18"
           x="0"
