@@ -241,7 +241,6 @@
 .achart li::after {
   right: auto;
   left: 50%;
-  border-left: 2px solid #c3a35f;
 }
 .achart li:only-child::before,
 .achart li:only-child::after {
@@ -252,13 +251,7 @@
   border: 0 none;
 }
 .achart li:last-child::before {
-  border-right: 2px solid #c3a35f;
   border-radius: 0 0 8px 0;
-  /* The last child's stub is this border-right; at the shared 24px
-     band height it rendered a few px short of the card, leaving a
-     visible gap (verified against A/B test variants). 28px makes
-     it meet the card. */
-  height: 28px;
 }
 .achart li:first-child::after {
   border-radius: 0 0 0 8px;

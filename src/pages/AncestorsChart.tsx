@@ -53,9 +53,31 @@ const AncestorCard: React.FC<{ node: AncestorNode; photos: Record<string, string
   </div>
 );
 
-const AncestorLi: React.FC<{ node: AncestorNode; photos: Record<string, string> }> = ({ node, photos }) => (
+const AncestorLi: React.FC<{ node: AncestorNode; photos: Record<string, string>; isRoot?: boolean }> = ({
+  node,
+  photos,
+  isRoot = false,
+}) => (
   <li>
     <AncestorCard node={node} photos={photos} />
+    {/* Vertical stub from this card down to the connector bar below.
+        A real element, not a pseudo-element border: the pseudo
+        version intermittently rendered a few px short of the card
+        for the last parent in a row, leaving a visible gap. */}
+    {!isRoot && (
+      <span
+        aria-hidden
+        style={{
+          position: 'absolute',
+          left: '50%',
+          bottom: 0,
+          width: 2,
+          height: 26,
+          marginLeft: -1,
+          background: '#C3A35F',
+        }}
+      />
+    )}
     {(node.father || node.mother) && (
       <ul>
         {node.father && <AncestorLi node={node.father} photos={photos} />}
@@ -261,7 +283,7 @@ const AncestorsChart: React.FC = () => {
               />
               <div className="achart">
                 <ul>
-                  <AncestorLi node={tree} photos={photos} />
+                  <AncestorLi node={tree} photos={photos} isRoot />
                 </ul>
               </div>
               <ChartFooter />
