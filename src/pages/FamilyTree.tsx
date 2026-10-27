@@ -172,26 +172,37 @@ export const FamilyTree: React.FC = () => {
         });
         return;
       }
-      let node: Element | null = card;
-      let transform = '';
-      while (node) {
+      // Accumulate the translate() of every ancestor up to (but not
+      // including) the zoom container, whose transform also carries
+      // the scale. The pure-SVG card sits inside a local
+      // translate(0, CARD_TOP) group under the node group; taking
+      // only the FIRST translate found — the old behaviour — reads
+      // that local offset as the node position and the view flies
+      // to the wrong place.
+      let nx = 0;
+      let ny = 0;
+      let found = false;
+      let node: Element | null = card.parentElement;
+      while (node && node.tagName.toLowerCase() !== 'svg') {
         const t = node.getAttribute?.('transform') || '';
-        if (t.includes('translate')) {
-          transform = t;
-          break;
+        if (t.includes('scale')) break;
+        const m = /translate\(\s*([-\d.]+)[,\s]+([-\d.]+)\s*\)/.exec(t);
+        if (m) {
+          nx += parseFloat(m[1]);
+          ny += parseFloat(m[2]);
+          found = true;
         }
         node = node.parentElement;
       }
-      const match = /translate\(\s*([-\d.]+)[,\s]+([-\d.]+)\s*\)/.exec(transform);
-      if (!match) {
+      if (!found) {
         toast.error('Could not locate that person on the tree.');
         return;
       }
-      const nx = parseFloat(match[1]);
-      const ny = parseFloat(match[2]);
       const z = Math.min(1.1, Math.max(zoom, 0.95));
       setZoom(z);
-      setTranslate({ x: dimensions.width / 2 - nx * z, y: dimensions.height * 0.42 - ny * z });
+      // Aim at the card's centre (the card hangs below the node
+      // point: top +20, height 82, so centre ≈ node y + 60).
+      setTranslate({ x: dimensions.width / 2 - nx * z, y: dimensions.height * 0.42 - (ny + 60) * z });
       setHighlightId(memberId);
       window.setTimeout(() => {
         setHighlightId((cur) => (cur === memberId ? null : cur));
