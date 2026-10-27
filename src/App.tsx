@@ -1,5 +1,5 @@
 import React from 'react';
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { ThemeProvider } from './context/ThemeContext';
 
@@ -24,6 +24,20 @@ import AdminMembers from './pages/AdminMembers';
 import AdminPhotos from './pages/AdminPhotos';
 import AdminSettings from './pages/AdminSettings';
 
+/**
+ * Site chrome (Navbar / Footer) wrapper. The app-style routes —
+ * admin, Quick Update and Login — run full-screen on phones with
+ * no global header or footer, like a native app. Desktop and the
+ * public pages keep the full site chrome.
+ */
+const APP_ROUTES_ON_MOBILE = ['/admin', '/quick-update', '/login'];
+
+const SiteChrome: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const location = useLocation();
+  const bareOnMobile = APP_ROUTES_ON_MOBILE.some((p) => location.pathname.startsWith(p));
+  return <div className={bareOnMobile ? 'hidden md:block' : undefined}>{children}</div>;
+};
+
 export default function App() {
   return (
     <ThemeProvider>
@@ -34,7 +48,9 @@ export default function App() {
       */}
       <HashRouter>
         <div id="app-root-layout" className="flex flex-col min-h-screen bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-150 transition-colors duration-300 font-sans selection:bg-amber-600 selection:text-white">
-          <Navbar />
+          <SiteChrome>
+            <Navbar />
+          </SiteChrome>
           
           <main id="app-main-content" className="flex-grow flex flex-col justify-start">
             <Routes>
@@ -60,7 +76,9 @@ export default function App() {
             </Routes>
           </main>
 
-          <Footer />
+          <SiteChrome>
+            <Footer />
+          </SiteChrome>
           <AdminBottomNav />
         </div>
         
