@@ -1,8 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Tree from 'react-d3-tree';
 import useTree from '../hooks/useTree';
+import useMembers from '../hooks/useMembers';
 import TreeNode from '../components/TreeNode';
-import { Loader2, GitMerge, RefreshCw, ZoomIn, Info, Maximize2 } from 'lucide-react';
+import TreeQuickEdit from '../components/TreeQuickEdit';
+import SearchableSelect from '../components/SearchableSelect';
+import { Member } from '../types';
+import { fullName, sortedByName } from '../utils/memberSave';
+import toast from 'react-hot-toast';
+import { Loader2, GitMerge, RefreshCw, ZoomIn, ZoomOut, Info, Maximize2 } from 'lucide-react';
 
 // Custom SVG path drawing function to connect children from the bottom-middle of parents' cards
 const customPathFunc = (link: any) => {
@@ -45,6 +51,102 @@ export const FamilyTree: React.FC = () => {
   const [zoom, setZoom] = useState<number>(0.8);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Member list (shared cache) powers the person search and, for an
+  // admin session, the tap-to-edit popup.
+  const { members: allMembers } = useMembers();
+  const [isAdmin, setIsAdmin] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('isAdmin') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  useEffect(() => {
+    try {
+      setIsAdmin(localStorage.getItem('isAdmin') === 'true');
+    } catch {
+      /* ignore */
+    }
+  }, []);
+  const [searchId, setSearchId] = useState('');
+  const [highlightId, setHighlightId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const editingMember: Member | null =
+    editingId != null ? allMembers.find((m) => String(m.id) === editingId) || null : null;
+
+  // Keep zoom/translate in sync with the user's own pan/zoom gestures
+  // (rd3t reports them via onUpdate). Functional updates that return
+  // the previous value when nothing changed keep this loop-free.
+  const handleTreeUpdate = useCallback((evt: any) => {
+    if (!evt || typeof evt.zoom !== 'number' || !evt.translate) return;
+    setZoom((prev) => (Math.abs(prev - evt.zoom) > 0.0001 ? evt.zoom : prev));
+    setTranslate((prev) =>
+      Math.abs(prev.x - evt.translate.x) > 0.5 || Math.abs(prev.y - evt.translate.y) > 0.5
+        ? { x: evt.translate.x, y: evt.translate.y }
+        : prev
+    );
+  }, []);
+
+  const zoomBy = useCallback(
+    (factor: number) => {
+      setZoom((prevZoom) => {
+        const next = Math.min(2, Math.max(0.2, +(prevZoom * factor).toFixed(3)));
+        if (next === prevZoom) return prevZoom;
+        setTranslate((prevT) => {
+          const cx = dimensions.width / 2;
+          const cy = dimensions.height / 2;
+          const ratio = next / prevZoom;
+          return { x: cx - (cx - prevT.x) * ratio, y: cy - (cy - prevT.y) * ratio };
+        });
+        return next;
+      });
+    },
+    [dimensions]
+  );
+
+  // Centre the view on one person's card (found in the rendered SVG)
+  // and ring-highlight it briefly.
+  const focusMember = useCallback(
+    (memberId: string) => {
+      const container = containerRef.current;
+      if (!container) return;
+      const card = container.querySelector(`[id="tree-card-member-${memberId}"]`);
+      if (!card) {
+        toast('That person is inside a collapsed branch. Tap EXPAND (+) on their family line, then search again.', {
+          icon: 'ℹ️',
+        });
+        return;
+      }
+      let node: Element | null = card;
+      let transform = '';
+      while (node) {
+        const t = node.getAttribute?.('transform') || '';
+        if (t.includes('translate')) {
+          transform = t;
+          break;
+        }
+        node = node.parentElement;
+      }
+      const match = /translate\(\s*([-\d.]+)[,\s]+([-\d.]+)\s*\)/.exec(transform);
+      if (!match) {
+        toast.error('Could not locate that person on the tree.');
+        return;
+      }
+      const nx = parseFloat(match[1]);
+      const ny = parseFloat(match[2]);
+      const z = Math.min(1.1, Math.max(zoom, 0.95));
+      setZoom(z);
+      setTranslate({ x: dimensions.width / 2 - nx * z, y: dimensions.height * 0.42 - ny * z });
+      setHighlightId(memberId);
+      window.setTimeout(() => {
+        setHighlightId((cur) => (cur === memberId ? null : cur));
+      }, 4500);
+    },
+    [dimensions, zoom]
+  );
+
+  const searchOptions = sortedByName(allMembers).map((m) => ({ id: String(m.id), name: fullName(m) }));
+
   // ResizeObserver for responsive canvas sizing (as required by responsive guidelines)
   useEffect(() => {
     if (containerRef.current) {
@@ -69,6 +171,8 @@ export const FamilyTree: React.FC = () => {
   const handleRecenter = () => {
     setTranslate({ x: dimensions.width / 2, y: 80 });
     setZoom(0.8);
+    setHighlightId(null);
+    setSearchId('');
   };
 
   return (
@@ -106,6 +210,26 @@ export const FamilyTree: React.FC = () => {
           </div>
         </div>
 
+
+        {/* Person search */}
+        <div className="mb-4 max-w-md">
+          <SearchableSelect
+            id="tree-person-search"
+            value={searchId}
+            onChange={(id) => {
+              setSearchId(id);
+              if (id) focusMember(id);
+            }}
+            options={searchOptions}
+            emptyLabel="-- Find a person in the tree --"
+            placeholder="Find a person in the tree"
+          />
+          {isAdmin && (
+            <p className="text-[11px] text-gray-400 dark:text-zinc-500 mt-1.5">
+              Admin: tap the pencil on any person's card to edit them right here.
+            </p>
+          )}
+        </div>
 
         {/* Tree Canvas Wrapper */}
         <div
@@ -146,6 +270,7 @@ export const FamilyTree: React.FC = () => {
                 dimensions={dimensions}
                 translate={translate}
                 zoom={zoom}
+                onUpdate={handleTreeUpdate}
                 scaleExtent={{ min: 0.2, max: 2.0 }}
                 orientation="vertical"
                 nodeSize={{ x: 355, y: 190 }}
@@ -156,9 +281,42 @@ export const FamilyTree: React.FC = () => {
                   <TreeNode
                     nodeDatum={rd3tProps.nodeDatum}
                     toggleNode={rd3tProps.toggleNode}
+                    isAdmin={isAdmin}
+                    highlightId={highlightId}
+                    onEditMember={(id) => setEditingId(id)}
                   />
                 )}
               />
+              {/* Floating zoom controls */}
+              <div className="absolute bottom-3 right-3 z-20 flex flex-col items-center gap-1 bg-white/95 dark:bg-zinc-900/95 backdrop-blur border border-gray-200 dark:border-zinc-800 rounded-2xl shadow-lg p-1">
+                <button
+                  type="button"
+                  onClick={() => zoomBy(1.25)}
+                  className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-700 dark:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 active:scale-95 transition"
+                  aria-label="Zoom in"
+                >
+                  <ZoomIn className="w-5 h-5" />
+                </button>
+                <span className="text-[11px] font-black text-gray-500 dark:text-zinc-400 tabular-nums">{Math.round(zoom * 100)}%</span>
+                <button
+                  type="button"
+                  onClick={() => zoomBy(0.8)}
+                  className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-700 dark:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 active:scale-95 transition"
+                  aria-label="Zoom out"
+                >
+                  <ZoomOut className="w-5 h-5" />
+                </button>
+                <div className="w-6 h-px bg-gray-200 dark:bg-zinc-800" />
+                <button
+                  type="button"
+                  onClick={handleRecenter}
+                  className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-700 dark:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 active:scale-95 transition"
+                  aria-label="Recenter tree"
+                  title="Recenter tree"
+                >
+                  <Maximize2 className="w-5 h-5" />
+                </button>
+              </div>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-center p-6 text-gray-400 dark:text-zinc-500">
@@ -167,6 +325,18 @@ export const FamilyTree: React.FC = () => {
             </div>
           )}
         </div>
+
+        {editingMember && (
+          <TreeQuickEdit
+            member={editingMember}
+            allMembers={allMembers}
+            onClose={() => setEditingId(null)}
+            onSaved={() => {
+              setEditingId(null);
+              refresh();
+            }}
+          />
+        )}
       </div>
     </div>
   );

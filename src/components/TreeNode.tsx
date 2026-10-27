@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart } from 'lucide-react';
+import { Heart, Pencil } from 'lucide-react';
 import { getDirectPhotoUrl } from '../utils';
 import { useTheme } from '../context/ThemeContext';
 
@@ -13,9 +13,15 @@ const isSafariOrIOS = typeof navigator !== 'undefined' && (
 interface TreeNodeProps {
   nodeDatum: any;
   toggleNode: () => void;
+  /** Show the quick-edit pencil on each person card (admin session) */
+  isAdmin?: boolean;
+  /** Member id to visually highlight (e.g. after a person search) */
+  highlightId?: string | null;
+  /** Called when an admin taps the pencil on a person's card */
+  onEditMember?: (memberId: string) => void;
 }
 
-export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode }) => {
+export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode, isAdmin, highlightId, onEditMember }) => {
   const navigate = useNavigate();
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
@@ -128,6 +134,7 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode }) => 
     const occupationTextClass = isDark ? 'text-zinc-500' : 'text-gray-400';
     const birthTextClass = isDark ? 'text-zinc-600' : 'text-zinc-400';
 
+    const isHighlighted = !!highlightId && hasValidId && String(m.id) === String(highlightId);
     return (
       <div
         id={`tree-card-member-${m.id}`}
@@ -137,12 +144,31 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode }) => 
             navigate(`/member/${m.id}`);
           }
         }}
-        className={`w-[214px] h-[82px] p-2 border rounded-xl shadow-md flex items-center gap-2.5 text-left ${cardBgClass} ${cardBorderClass} ${transitionClass} ${
+        style={
+          isHighlighted
+            ? { boxShadow: '0 0 0 4px #f59e0b, 0 14px 28px rgba(0,0,0,0.30)', zIndex: 20 }
+            : undefined
+        }
+        className={`relative w-[214px] h-[82px] p-2 border rounded-xl shadow-md flex items-center gap-2.5 text-left ${cardBgClass} ${cardBorderClass} ${transitionClass} ${
           hasValidId
             ? `cursor-pointer group ${hoverScaleClass}`
             : 'cursor-default'
-        } ${hoverBorderClass}`}
+        } ${hoverBorderClass} ${isHighlighted ? 'border-amber-500' : ''}`}
       >
+        {isAdmin && hasValidId && onEditMember && (
+          <button
+            type="button"
+            aria-label={`Edit ${mFullName}`}
+            title={`Edit ${mFullName}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onEditMember(String(m.id));
+            }}
+            className="absolute -top-2.5 -right-2.5 w-8 h-8 rounded-full bg-amber-600 hover:bg-amber-700 text-white shadow-lg border-2 border-white dark:border-zinc-900 flex items-center justify-center z-30 active:scale-95 transition"
+          >
+            <Pencil className="w-3.5 h-3.5" />
+          </button>
+        )}
         {/* Node Avatar */}
         <div className={`${isSafariOrIOS ? '' : 'relative'} w-11 h-11 flex-shrink-0 rounded-lg overflow-hidden flex items-center justify-center border shadow-inner ${avatarBgBorderClass}`}>
           {m.photoUrl ? (
