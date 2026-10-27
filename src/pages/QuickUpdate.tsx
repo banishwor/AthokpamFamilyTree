@@ -252,25 +252,28 @@ export const QuickUpdate: React.FC = () => {
 
   /* ---------------- Find panel ---------------- */
   const findPanel = (
-    <div className="bg-white dark:bg-zinc-900 border border-gray-150 dark:border-white/5 rounded-3xl p-5 shadow-sm space-y-4">
-      <div className="space-y-1">
-        <h3 className="text-base font-black text-gray-950 dark:text-white uppercase tracking-wider">
-          1. Find Your Profile
-        </h3>
-        <p className="text-xs text-gray-400 leading-relaxed">
-          Type your name below and tap your listing.
-        </p>
-      </div>
+    <div className="md:bg-white md:dark:bg-zinc-900 md:border md:border-gray-150 md:dark:border-white/5 md:rounded-3xl md:p-5 md:shadow-sm">
+      {/* Sticky on mobile: title + search stay pinned while the names scroll */}
+      <div className="sticky top-0 z-20 -mx-4 px-4 pt-3 pb-3 bg-gray-50 dark:bg-zinc-950 md:static md:mx-0 md:px-0 md:pt-0 md:pb-0 md:bg-transparent">
+        <div className="space-y-1 md:mb-4">
+          <h3 className="text-base font-black text-gray-950 dark:text-white uppercase tracking-wider">
+            1. Find Your Profile
+          </h3>
+          <p className="text-xs text-gray-400 leading-relaxed">
+            Type your name below and tap your listing.
+          </p>
+        </div>
 
-      <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search your name..."
-          className="w-full pl-12 pr-4 min-h-[52px] py-3 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-2xl text-base font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-gray-900 dark:text-white"
-        />
+        <div className="relative mt-3 md:mt-0">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search your name..."
+            className="w-full pl-12 pr-4 min-h-[52px] py-3 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-2xl text-base font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-gray-900 dark:text-white"
+          />
+        </div>
       </div>
 
       {loadingMembers ? (
@@ -279,7 +282,7 @@ export const QuickUpdate: React.FC = () => {
           <span>Loading family registry...</span>
         </div>
       ) : (
-        <div className="space-y-2 md:max-h-[560px] md:overflow-y-auto md:pr-1">
+        <div className="space-y-2 mt-1 md:mt-4 md:max-h-[560px] md:overflow-y-auto md:pr-1">
           {filteredMembers.length > 0 ? (
             filteredMembers.map((m) => {
               const isSelected = selectedMember?.id === m.id;
