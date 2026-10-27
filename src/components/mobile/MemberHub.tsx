@@ -6,7 +6,7 @@ import { apiService } from '../../services/api';
 import SearchableSelect from '../SearchableSelect';
 import PhotoPickerField from '../PhotoPickerField';
 import { ProcessedPhoto } from '../../utils/image';
-import { formatDateInput, fullName, memberCompleteness, saveMemberWithSpouseLink } from '../../utils/memberSave';
+import { formatDateInput, fullName, memberCompleteness, saveMemberWithSpouseLink, sortedByName } from '../../utils/memberSave';
 import { GenderToggle, mobileInputCls, mobileLabelCls } from './shared';
 
 interface MemberHubProps {
@@ -120,7 +120,7 @@ export const MemberHub: React.FC<MemberHubProps> = ({ member, allMembers, onClos
       .filter(Boolean)
       .join(' · ') || 'No family linked yet';
   const candidates = allMembers.filter((m) => String(m.id) !== String(member.id));
-  const toOptions = (list: Member[]) => list.map((m) => ({ id: String(m.id), name: fullName(m) }));
+  const toOptions = (list: Member[]) => sortedByName(list).map((m) => ({ id: String(m.id), name: fullName(m) }));
   const { percent } = memberCompleteness(member);
 
   const handleBack = () => {

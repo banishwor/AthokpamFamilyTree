@@ -21,7 +21,7 @@ import {
 import toast from 'react-hot-toast';
 import PhotoPickerField from '../components/PhotoPickerField';
 import { ProcessedPhoto, processPhotoFile } from '../utils/image';
-import { formatDateInput } from '../utils/memberSave';
+import { compareByFullName, formatDateInput } from '../utils/memberSave';
 
 /**
  * Quick Update Portal — family members update their OWN details
@@ -188,10 +188,12 @@ export const QuickUpdate: React.FC = () => {
     }
   };
 
-  const filteredMembers = members.filter((m) => {
-    const name = `${m.firstName} ${m.middleName || ''} ${m.lastName}`.toLowerCase();
-    return name.includes(searchQuery.toLowerCase()) || String(m.id).includes(searchQuery);
-  });
+  const filteredMembers = members
+    .filter((m) => {
+      const name = `${m.firstName} ${m.middleName || ''} ${m.lastName}`.toLowerCase();
+      return name.includes(searchQuery.toLowerCase()) || String(m.id).includes(searchQuery);
+    })
+    .sort(compareByFullName);
 
   const view: 'find' | 'edit' | 'done' = savedName ? 'done' : selectedMember ? 'edit' : 'find';
 

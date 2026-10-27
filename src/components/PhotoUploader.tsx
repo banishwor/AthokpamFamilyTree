@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { apiService } from '../services/api';
 import { Member } from '../types';
 import SearchableSelect from './SearchableSelect';
+import { sortedByName } from '../utils/memberSave';
 import { Camera, Image as ImageIcon, Loader2, CheckCircle2, UserCheck, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -184,7 +185,7 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
             emptyLabel="-- Choose Member to Update --"
             placeholder="Choose member to update"
             disabled={!!initialMemberId}
-            options={members.map((m) => ({ id: String(m.id), name: `${m.firstName} ${m.middleName ? `${m.middleName} ` : ''}${m.lastName}` }))}
+            options={sortedByName(members).map((m) => ({ id: String(m.id), name: `${m.firstName} ${m.middleName ? `${m.middleName} ` : ''}${m.lastName}` }))}
           />
         )}
       </div>

@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { ChevronRight, Loader2, Search, User } from 'lucide-react';
 import { Member } from '../../types';
 import { getDirectPhotoUrl } from '../../utils';
-import { fullName, memberCompleteness } from '../../utils/memberSave';
+import { compareByFullName, fullName, memberCompleteness } from '../../utils/memberSave';
 import MemberHub from './MemberHub';
 import AddMemberWizard from './AddMemberWizard';
 
@@ -91,7 +91,7 @@ export const MobileMembers: React.FC<MobileMembersProps> = ({ members, loading, 
         (m.occupation || '').toLowerCase().includes(q) ||
         (m.address || '').toLowerCase().includes(q)
       );
-    });
+    }).sort(compareByFullName);
   }, [members, query, filter]);
 
   const chips: Array<{ key: Filter; label: string }> = [

@@ -5,6 +5,7 @@ import useMembers from '../hooks/useMembers';
 import { Member } from '../types';
 import { getDirectPhotoUrl } from '../utils';
 import SearchableSelect, { shortId } from '../components/SearchableSelect';
+import { compareByFullName } from '../utils/memberSave';
 import MobileMembers from '../components/mobile/MobileMembers';
 import {
   Plus,
@@ -257,7 +258,7 @@ export const AdminMembers: React.FC = () => {
   // Filter lists inside table
   const filteredMembers = useMemo(() => {
     if (!members) return [];
-    if (query.trim() === '') return members;
+    if (query.trim() === '') return [...members].sort(compareByFullName);
     const q = query.toLowerCase();
     return members.filter((m) => {
       const full = `${m.firstName} ${m.lastName}`.toLowerCase();
@@ -265,7 +266,7 @@ export const AdminMembers: React.FC = () => {
       const occupation = m.occupation?.toLowerCase() || '';
       const id = m.id?.toString() || '';
       return full.includes(q) || addr.includes(q) || occupation.includes(q) || id.includes(q);
-    });
+    }).sort(compareByFullName);
   }, [members, query]);
 
   // Candidates for parents/spouse (excluding the currently edited member themselves to prevent self-referencing cycles)
@@ -550,6 +551,7 @@ export const AdminMembers: React.FC = () => {
                       placeholder="Select father"
                       options={candidateRelations
                         .filter((m) => m.gender === 'M')
+                        .sort(compareByFullName)
                         .map((m) => ({ id: String(m.id), name: `${m.firstName} ${m.lastName}` }))}
                     />
                   </div>
@@ -564,6 +566,7 @@ export const AdminMembers: React.FC = () => {
                       placeholder="Select mother"
                       options={candidateRelations
                         .filter((m) => m.gender === 'F')
+                        .sort(compareByFullName)
                         .map((m) => ({ id: String(m.id), name: `${m.firstName} ${m.lastName}` }))}
                     />
                   </div>
@@ -578,6 +581,7 @@ export const AdminMembers: React.FC = () => {
                       placeholder="Select spouse"
                       options={candidateRelations
                         .filter((m) => gender === 'M' ? m.gender === 'F' : gender === 'F' ? m.gender === 'M' : true)
+                        .sort(compareByFullName)
                         .map((m) => ({ id: String(m.id), name: `${m.firstName} ${m.lastName}` }))}
                     />
                   </div>

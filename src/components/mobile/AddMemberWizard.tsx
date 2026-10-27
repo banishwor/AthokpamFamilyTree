@@ -6,7 +6,7 @@ import { apiService } from '../../services/api';
 import SearchableSelect from '../SearchableSelect';
 import PhotoPickerField from '../PhotoPickerField';
 import { ProcessedPhoto } from '../../utils/image';
-import { fullName, saveMemberWithSpouseLink } from '../../utils/memberSave';
+import { fullName, saveMemberWithSpouseLink, sortedByName } from '../../utils/memberSave';
 import { GenderToggle, MobileSection, mobileInputCls, mobileLabelCls } from './shared';
 
 interface AddMemberWizardProps {
@@ -58,7 +58,7 @@ export const AddMemberWizard: React.FC<AddMemberWizardProps> = ({ allMembers, on
     const m = allMembers.find((x) => String(x.id) === id);
     return m ? fullName(m) : '—';
   };
-  const toOptions = (list: Member[]) => list.map((m) => ({ id: String(m.id), name: fullName(m) }));
+  const toOptions = (list: Member[]) => sortedByName(list).map((m) => ({ id: String(m.id), name: fullName(m) }));
 
   const goNext = () => {
     if (step === 1 && (!firstName.trim() || !lastName.trim())) {

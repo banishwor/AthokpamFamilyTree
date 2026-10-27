@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Camera, ChevronRight, GitMerge, Images, Loader2, UserPlus, Users } from 'lucide-react';
 import { Member } from '../../types';
 import { getDirectPhotoUrl } from '../../utils';
-import { fullName } from '../../utils/memberSave';
+import { fullName, sortedByName } from '../../utils/memberSave';
 
 interface MobileAdminHomeProps {
   members: Member[];
@@ -43,9 +43,9 @@ export const MobileAdminHome: React.FC<MobileAdminHomeProps> = ({ members, loadi
     };
   }, [members]);
 
-  const noPhoto = useMemo(() => members.filter((m) => !m.photoUrl), [members]);
-  const noParents = useMemo(() => members.filter((m) => !m.fatherId && !m.motherId), [members]);
-  const noBirth = useMemo(() => members.filter((m) => !m.birthDate), [members]);
+  const noPhoto = useMemo(() => sortedByName(members.filter((m) => !m.photoUrl)), [members]);
+  const noParents = useMemo(() => sortedByName(members.filter((m) => !m.fatherId && !m.motherId)), [members]);
+  const noBirth = useMemo(() => sortedByName(members.filter((m) => !m.birthDate)), [members]);
   const recent = useMemo(
     () =>
       [...members]

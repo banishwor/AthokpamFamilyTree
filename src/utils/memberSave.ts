@@ -22,6 +22,15 @@ export function fullName(m: Pick<Member, 'firstName' | 'middleName' | 'lastName'
   return [m.firstName, m.middleName, m.lastName].filter(Boolean).join(' ').trim();
 }
 
+/** A–Z ordering by displayed full name (case-insensitive). */
+export const compareByFullName = (a: Member, b: Member): number =>
+  fullName(a).localeCompare(fullName(b), undefined, { sensitivity: 'base' });
+
+/** Return a copy of the list sorted A–Z by full name. */
+export function sortedByName<T extends Member>(list: T[]): T[] {
+  return [...list].sort(compareByFullName);
+}
+
 /** Profile completeness across 8 signals, used by rings and queues. */
 export function memberCompleteness(m: Member): { percent: number; missing: string[] } {
   const checks: Array<[boolean, string]> = [
