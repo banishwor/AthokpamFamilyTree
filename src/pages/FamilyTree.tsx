@@ -213,19 +213,28 @@ export const FamilyTree: React.FC = () => {
 
   const searchOptions = sortedByName(allMembers).map((m) => ({ id: String(m.id), name: fullName(m) }));
 
-  // ResizeObserver for responsive canvas sizing (as required by responsive guidelines)
+  // ResizeObserver for responsive canvas sizing (as required by responsive guidelines).
+  // It may ONLY set the dimensions after the first sizing: recentring
+  // on every resize was the search killer — on phones the keyboard
+  // opening/closing for the person search resizes the viewport, the
+  // observer fired, and the view snapped back to the root before the
+  // search pan could ever be seen. First size still centres the root.
+  const hasSizedRef = useRef(false);
   useEffect(() => {
     if (containerRef.current) {
       const resizeObserver = new ResizeObserver((entries) => {
         for (let entry of entries) {
           const { width, height } = entry.contentRect;
-          
+
           // Guard against incorrect zero scale values reporting on start (especially Safari/iOS lifecycle)
           if (width > 120 && height > 120) {
             const targetHeight = height > 200 ? height : 600;
             setDimensions({ width, height: targetHeight });
-            // Center the root node horizontally, place it slightly down vertically
-            setTranslate({ x: width / 2, y: 80 });
+            if (!hasSizedRef.current) {
+              hasSizedRef.current = true;
+              // Center the root node horizontally, place it slightly down vertically
+              setTranslate({ x: width / 2, y: 80 });
+            }
           }
         }
       });
