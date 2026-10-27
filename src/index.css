@@ -71,11 +71,17 @@
   opacity: 0.8 !important;
 }
 
-/* Tree node labels: favour geometric precision over the default
-   speed-optimised text rasterisation — at small sizes inside the
-   zoom transform, optimised rendering made the 800-weight labels
-   blob together. (Labels now use weight 700 as well.) */
+/* Tree node labels.
+   stroke: none is the important part: react-d3-tree injects a
+   global `.rd3t-node { stroke: #000; stroke-width: 2 }` rule, and
+   SVG stroke is inherited — every <text> inside a node silently
+   picked up a 2px black outline, which made labels look extra-fat
+   and swallowed light fills (white initials and the gold
+   "View Profile" both rendered black). Presentation attributes on
+   the text set its fill, but nothing set its stroke, so the
+   inherited outline won. Kill it here, at ID specificity. */
 #react-d3-tree-viewport text {
+  stroke: none;
   text-rendering: geometricPrecision;
 }
 
