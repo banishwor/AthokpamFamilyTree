@@ -21,10 +21,10 @@ const Charts: React.FC = () => {
   const selected = members.find((m) => m.id === personId) ?? null;
 
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-zinc-950 py-8">
+    <div className="min-h-screen bg-[#FDFBF6] md:bg-gray-50/50 dark:bg-zinc-950 py-6 md:py-8">
       <div className="max-w-2xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-8">
-          <h1 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight">
+          <h1 className="text-[26px] sm:text-3xl font-black text-gray-900 dark:text-white tracking-tight">
             Family Charts
           </h1>
           <p className="text-sm text-gray-500 dark:text-zinc-400 mt-2 max-w-md mx-auto">
@@ -59,7 +59,7 @@ const Charts: React.FC = () => {
               type="button"
               disabled={!selected}
               onClick={() => selected && navigate(`/chart/${selected.id}`)}
-              className="min-h-[92px] rounded-2xl border-2 border-amber-600/70 bg-amber-50 dark:bg-amber-950/20 p-4 text-left disabled:opacity-40 disabled:border-gray-200 dark:disabled:border-zinc-800 disabled:bg-white dark:disabled:bg-zinc-900 transition"
+              className="min-h-[104px] md:min-h-[92px] rounded-2xl border-2 border-amber-600/70 bg-amber-50 dark:bg-amber-950/20 p-4 text-left disabled:opacity-40 disabled:border-gray-200 dark:disabled:border-zinc-800 disabled:bg-white dark:disabled:bg-zinc-900 transition"
             >
               <span className="flex items-center gap-2 font-extrabold text-gray-900 dark:text-white text-base">
                 <Network className="w-5 h-5 text-amber-600" /> Descendants Chart
@@ -73,7 +73,7 @@ const Charts: React.FC = () => {
               type="button"
               disabled={!selected}
               onClick={() => selected && navigate(`/ancestors/${selected.id}`)}
-              className="min-h-[92px] rounded-2xl border-2 border-amber-600/70 bg-amber-50 dark:bg-amber-950/20 p-4 text-left disabled:opacity-40 disabled:border-gray-200 dark:disabled:border-zinc-800 disabled:bg-white dark:disabled:bg-zinc-900 transition"
+              className="min-h-[104px] md:min-h-[92px] rounded-2xl border-2 border-amber-600/70 bg-amber-50 dark:bg-amber-950/20 p-4 text-left disabled:opacity-40 disabled:border-gray-200 dark:disabled:border-zinc-800 disabled:bg-white dark:disabled:bg-zinc-900 transition"
             >
               <span className="flex items-center gap-2 font-extrabold text-gray-900 dark:text-white text-base">
                 <History className="w-5 h-5 text-amber-600" /> Ancestors Chart

@@ -17,6 +17,7 @@ import {
   MapPin
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import MobileRelationship from '../components/mobile/MobileRelationship';
 
 export const RelationshipFinder: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -91,8 +92,8 @@ export const RelationshipFinder: React.FC = () => {
   };
 
   // Find direct relationship trigger
-  const handleFindRelationship = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleFindRelationship = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     if (!member1Id || !member2Id) {
       toast.error('Please select both family members first.');
       return;
@@ -272,6 +273,28 @@ export const RelationshipFinder: React.FC = () => {
   }
 
   return (
+    <>
+      <div className="md:hidden">
+        <MobileRelationship
+          members={members}
+          loading={loading}
+          error={error}
+          member1Id={member1Id}
+          member2Id={member2Id}
+          onSelect1={setMember1Id}
+          onSelect2={setMember2Id}
+          onSwap={() => {
+            setMember1Id(member2Id);
+            setMember2Id(member1Id);
+          }}
+          onFind={() => handleFindRelationship()}
+          calculating={calculating}
+          relationshipStr={relationshipStr}
+          lineagePath={lineagePath}
+          hasCalculated={hasCalculated}
+        />
+      </div>
+      <div className="hidden md:block">
     <div id="relationship-finder-page" className="min-h-screen bg-gray-50/50 dark:bg-zinc-950 py-10 transition-colors duration-300">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
@@ -608,6 +631,8 @@ export const RelationshipFinder: React.FC = () => {
 
       </div>
     </div>
+      </div>
+    </>
   );
 };
 
