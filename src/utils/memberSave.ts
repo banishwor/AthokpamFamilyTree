@@ -27,6 +27,24 @@ export const compareByFullName = (a: Member, b: Member): number =>
   fullName(a).localeCompare(fullName(b), undefined, { sensitivity: 'base' });
 
 /** Return a copy of the list sorted A–Z by full name. */
+/**
+ * Family order for siblings in trees and charts: eldest first
+ * (ascending birth date), so the eldest is always leftmost.
+ * Members without a birth date go after dated siblings; ties and
+ * undated pairs fall back to A–Z by full name. Mirrors the ordering
+ * the interactive tree has always used.
+ */
+export function compareByBirthThenName(a: Member, b: Member): number {
+  const dateA = a.birthDate ? new Date(a.birthDate).getTime() : NaN;
+  const dateB = b.birthDate ? new Date(b.birthDate).getTime() : NaN;
+  const hasA = !Number.isNaN(dateA);
+  const hasB = !Number.isNaN(dateB);
+  if (hasA && hasB) return dateA - dateB;
+  if (hasA) return -1;
+  if (hasB) return 1;
+  return compareByFullName(a, b);
+}
+
 export function sortedByName<T extends Member>(list: T[]): T[] {
   return [...list].sort(compareByFullName);
 }

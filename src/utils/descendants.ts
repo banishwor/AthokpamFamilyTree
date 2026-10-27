@@ -1,5 +1,5 @@
 import { Member } from '../types';
-import { compareByFullName } from './memberSave';
+import { compareByBirthThenName } from './memberSave';
 
 /** One person in a descendant chart, with their spouse (when shown) and their chart-children. */
 export interface DescendantNode {
@@ -26,7 +26,7 @@ export function childrenOfCouple(aId: string, bId: string | null, members: Membe
         m.motherId === aId ||
         (bId !== null && (m.fatherId === bId || m.motherId === bId))
     )
-    .sort(compareByFullName);
+    .sort(compareByBirthThenName);
 }
 
 /**
