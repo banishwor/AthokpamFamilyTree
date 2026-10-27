@@ -152,27 +152,27 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode, isAdm
         ) : (
           <>
             <rect x={cx + 8} y={19} width={44} height={44} clipPath={`url(#${clipId})`} fill={isFemaleCard ? '#F43F5E' : '#B08A3C'} />
-            <text x={cx + 30} y={41} textAnchor="middle" dominantBaseline="central" fontSize={13} fontWeight={800} fill="#FFFFFF">
+            <text x={cx + 30} y={41} textAnchor="middle" dominantBaseline="central" fontSize={14} fontWeight={700} fill="#FFFFFF">
               {getInitials(m.firstName, m.lastName)}
             </text>
           </>
         )}
         {/* Details */}
-        <text x={cx + 60} y={m.occupation || m.birthDate ? 28 : 36} fontSize={11.5} fontWeight={800} fill={nameFill}>
-          {truncate(mFullName, 24)}
+        <text x={cx + 60} y={m.occupation || m.birthDate ? 28 : 36} fontSize={12.5} fontWeight={700} fill={nameFill}>
+          {truncate(mFullName, 23)}
         </text>
         {m.occupation ? (
-          <text x={cx + 60} y={44} fontSize={9} fill={subFill}>
+          <text x={cx + 60} y={45} fontSize={9.5} fill={subFill}>
             {truncate(m.occupation, 32)}
           </text>
         ) : null}
         {m.birthDate ? (
-          <text x={cx + 60} y={m.occupation ? 58 : 46} fontSize={8.5} fontFamily="'JetBrains Mono', monospace" fill={subFill}>
+          <text x={cx + 60} y={m.occupation ? 59 : 47} fontSize={9} fontFamily="'JetBrains Mono', monospace" fill={subFill}>
             {truncate(`b. ${m.birthDate}`, 30)}
           </text>
         ) : null}
         {hasValidId && (
-          <text x={cx + 60} y={74} fontSize={8.5} fontWeight={800} fill="#C5A059">
+          <text x={cx + 60} y={74} fontSize={9} fontWeight={700} fill="#C5A059">
             View Profile →
           </text>
         )}

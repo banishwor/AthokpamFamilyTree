@@ -71,6 +71,14 @@
   opacity: 0.8 !important;
 }
 
+/* Tree node labels: favour geometric precision over the default
+   speed-optimised text rasterisation — at small sizes inside the
+   zoom transform, optimised rendering made the 800-weight labels
+   blob together. (Labels now use weight 700 as well.) */
+#react-d3-tree-viewport text {
+  text-rendering: geometricPrecision;
+}
+
 /* Custom Scrollbar for modern touch */
 ::-webkit-scrollbar {
   width: 6px;
