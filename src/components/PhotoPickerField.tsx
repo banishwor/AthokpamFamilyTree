@@ -1,4 +1,4 @@
-import React, { useId, useState } from 'react';
+import React, { useId, useRef, useState } from 'react';
 import { Camera, ImagePlus, Loader2, RefreshCw, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getDirectPhotoUrl } from '../utils';
@@ -34,6 +34,14 @@ export const PhotoPickerField: React.FC<PhotoPickerFieldProps> = ({
   const uid = useId().replace(/[:]/g, '');
   const cameraId = `camera-input-${uid}`;
   const galleryId = `gallery-input-${uid}`;
+  // Trigger the inputs via refs + real buttons. The previous
+  // <label htmlFor> activation proved unreliable on Android
+  // browsers (notably when the label unmounted mid-tap inside the
+  // action sheet, the file dialog never opened).
+  const cameraRef = useRef<HTMLInputElement>(null);
+  const galleryRef = useRef<HTMLInputElement>(null);
+  const openCamera = () => cameraRef.current?.click();
+  const openGallery = () => galleryRef.current?.click();
   const [processing, setProcessing] = useState(false);
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,8 +67,8 @@ export const PhotoPickerField: React.FC<PhotoPickerFieldProps> = ({
   if (variant === 'compact') {
     return (
       <div>
-        <input id={cameraId} type="file" accept="image/*" capture="environment" onChange={handleFile} className="hidden" />
-        <input id={galleryId} type="file" accept="image/*" onChange={handleFile} className="hidden" />
+        <input ref={cameraRef} id={cameraId} type="file" accept="image/*" capture="environment" onChange={handleFile} className="hidden" />
+        <input ref={galleryRef} id={galleryId} type="file" accept="image/*" onChange={handleFile} className="hidden" />
 
         <div className="flex items-center gap-4">
           <button
@@ -97,13 +105,13 @@ export const PhotoPickerField: React.FC<PhotoPickerFieldProps> = ({
           <div className="fixed inset-0 z-[80] bg-black/50 flex items-end justify-center" onClick={() => setSheetOpen(false)}>
             <div className="w-full max-w-md p-3 pb-5 animate-sheet-up" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)' }} onClick={(e) => e.stopPropagation()}>
               <div className="bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden">
-                <label htmlFor={cameraId} onClick={() => setSheetOpen(false)} className="w-full min-h-[56px] px-5 flex items-center gap-3 text-base font-semibold text-gray-900 dark:text-white active:bg-gray-50 dark:active:bg-zinc-800 cursor-pointer">
+                <button type="button" onClick={() => { openCamera(); setSheetOpen(false); }} className="w-full min-h-[56px] px-5 flex items-center gap-3 text-base font-semibold text-gray-900 dark:text-white active:bg-gray-50 dark:active:bg-zinc-800 text-left">
                   <Camera className="w-5 h-5 text-amber-600" /> Take Photo
-                </label>
+                </button>
                 <div className="h-px bg-gray-100 dark:bg-zinc-800 mx-5" />
-                <label htmlFor={galleryId} onClick={() => setSheetOpen(false)} className="w-full min-h-[56px] px-5 flex items-center gap-3 text-base font-semibold text-gray-900 dark:text-white active:bg-gray-50 dark:active:bg-zinc-800 cursor-pointer">
+                <button type="button" onClick={() => { openGallery(); setSheetOpen(false); }} className="w-full min-h-[56px] px-5 flex items-center gap-3 text-base font-semibold text-gray-900 dark:text-white active:bg-gray-50 dark:active:bg-zinc-800 text-left">
                   <ImagePlus className="w-5 h-5 text-amber-600" /> Choose from Gallery
-                </label>
+                </button>
                 {value && (
                   <>
                     <div className="h-px bg-gray-100 dark:bg-zinc-800 mx-5" />
@@ -151,24 +159,26 @@ export const PhotoPickerField: React.FC<PhotoPickerFieldProps> = ({
         )}
       </div>
 
-      <input id={cameraId} type="file" accept="image/*" capture="environment" onChange={handleFile} className="hidden" />
-      <input id={galleryId} type="file" accept="image/*" onChange={handleFile} className="hidden" />
+      <input ref={cameraRef} id={cameraId} type="file" accept="image/*" capture="environment" onChange={handleFile} className="hidden" />
+      <input ref={galleryRef} id={galleryId} type="file" accept="image/*" onChange={handleFile} className="hidden" />
 
       <div className="grid grid-cols-2 gap-2">
-        <label
-          htmlFor={cameraId}
+        <button
+          type="button"
+          onClick={openCamera}
           className="min-h-[52px] px-3 bg-amber-600 text-white font-extrabold text-sm rounded-2xl flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-[0.98] transition"
         >
           {processing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Camera className="w-5 h-5" />}
           Take Photo
-        </label>
-        <label
-          htmlFor={galleryId}
+        </button>
+        <button
+          type="button"
+          onClick={openGallery}
           className="min-h-[52px] px-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 text-gray-800 dark:text-zinc-100 font-extrabold text-sm rounded-2xl flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] transition"
         >
           {processing ? <Loader2 className="w-5 h-5 animate-spin" /> : <RefreshCw className="w-5 h-5" />}
           {value || currentPhotoUrl ? 'Change Photo' : 'From Gallery'}
-        </label>
+        </button>
       </div>
       <p className="text-xs text-gray-400 text-center">
         Photos are resized &amp; compressed on your phone before upload.

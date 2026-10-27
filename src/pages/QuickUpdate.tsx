@@ -144,7 +144,7 @@ export const QuickUpdate: React.FC = () => {
     }
 
     setSaving(true);
-    const saveToast = toast.loading('Saving updates to lineage cloud...');
+    const saveToast = toast.loading('Saving… the family server can take up to a minute. Please keep this screen open.');
 
     try {
       let finalPhotoUrl = selectedMember.photoUrl;
@@ -155,8 +155,10 @@ export const QuickUpdate: React.FC = () => {
         const uploadedUrl = uploadRes.fileUrl || uploadRes.photoUrl;
 
         if (uploadRes.success && uploadedUrl) {
+          // The updateMember payload below already carries photoUrl —
+          // no separate updateMemberPhoto call (each backend call
+          // costs ~30s on the Apps Script round trip).
           finalPhotoUrl = uploadedUrl;
-          await apiService.updateMemberPhoto(selectedMember.id, uploadedUrl);
         } else {
           throw new Error(uploadRes.message || 'Photo upload failed.');
         }

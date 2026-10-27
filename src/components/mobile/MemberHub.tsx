@@ -134,7 +134,7 @@ export const MemberHub: React.FC<MemberHubProps> = ({ member, allMembers, onClos
       return;
     }
     setSaving(true);
-    const apiToast = toast.loading('Saving portrait and details...');
+    const apiToast = toast.loading('Saving… the family server can take up to a minute. Please keep this screen open.');
     try {
       let photoUrl = member.photoUrl || undefined;
       if (photo) {

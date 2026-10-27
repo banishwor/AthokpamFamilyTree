@@ -70,7 +70,7 @@ export const AddMemberWizard: React.FC<AddMemberWizardProps> = ({ allMembers, on
 
   const handleCreate = async () => {
     setCreating(true);
-    const apiToast = toast.loading('Creating member...');
+    const apiToast = toast.loading('Creating member… the family server can take up to a minute. Please keep this screen open.');
     try {
       let photoUrl: string | undefined;
       if (photo) {
