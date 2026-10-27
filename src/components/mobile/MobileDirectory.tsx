@@ -36,8 +36,11 @@ const MobileDirectory: React.FC<{ members: Member[]; loading: boolean; error: st
 
   return (
     <div className="bg-[#FDFBF6] dark:bg-zinc-950 min-h-screen pb-10">
-      {/* Sticky search header (below the sticky navbar) */}
-      <div className="sticky top-16 z-30 bg-[#FDFBF6]/95 dark:bg-zinc-950/95 backdrop-blur-md px-4 pt-3 pb-3 border-b border-amber-900/5 dark:border-white/5">
+      {/* Sticky search header. Pins to the very top: the site navbar
+          is wrapped in its own SiteChrome div, so it scrolls away
+          instead of sticking — a top-16 offset here left a 64px gap
+          with list rows showing above the header (his screenshot). */}
+      <div className="sticky top-0 z-30 bg-[#FDFBF6]/95 dark:bg-zinc-950/95 backdrop-blur-md px-4 pt-3 pb-3 border-b border-amber-900/5 dark:border-white/5">
         <h1 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">Members</h1>
         <div className="relative mt-2.5">
           <Search className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />

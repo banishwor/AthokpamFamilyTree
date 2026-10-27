@@ -55,7 +55,7 @@ const MobileProfile: React.FC<Props> = ({ member, parents, spouse, children, sib
   return (
     <div className="bg-[#FDFBF6] dark:bg-zinc-950 min-h-screen pb-10">
       {/* Top bar */}
-      <div className="sticky top-16 z-30 bg-[#FDFBF6]/95 dark:bg-zinc-950/95 backdrop-blur-md px-3 py-2 flex items-center gap-1 border-b border-amber-900/5 dark:border-white/5">
+      <div className="sticky top-0 z-30 bg-[#FDFBF6]/95 dark:bg-zinc-950/95 backdrop-blur-md px-3 py-2 flex items-center gap-1 border-b border-amber-900/5 dark:border-white/5">
         <button
           type="button"
           onClick={() => navigate(-1)}
