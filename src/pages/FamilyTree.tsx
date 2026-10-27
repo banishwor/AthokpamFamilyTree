@@ -51,7 +51,6 @@ export const FamilyTree: React.FC = () => {
 
   const [zoom, setZoom] = useState<number>(0.8);
   const containerRef = useRef<HTMLDivElement>(null);
-  const pageRef = useRef<HTMLDivElement>(null);
 
   // Fullscreen (with landscape lock on Android) — the tree is wide,
   // so a landscape fullscreen view is its natural shape on a phone.
@@ -67,7 +66,7 @@ export const FamilyTree: React.FC = () => {
         await document.exitFullscreen();
         return;
       }
-      const el = pageRef.current as any;
+      const el = containerRef.current as any;
       if (!el || typeof el.requestFullscreen !== 'function') throw new Error('unsupported');
       await el.requestFullscreen();
       // Best-effort landscape lock (Android Chrome/Samsung Internet;
@@ -77,7 +76,7 @@ export const FamilyTree: React.FC = () => {
       } catch {
         /* unsupported — ignore */
       }
-      window.setTimeout(() => handleRecenter(), 350);
+      window.setTimeout(() => handleRecenter(), 500);
     } catch {
       toast('Fullscreen is not available in this browser. Try rotating your phone sideways.', { icon: 'ℹ️' });
     }
@@ -208,7 +207,7 @@ export const FamilyTree: React.FC = () => {
   };
 
   return (
-    <div ref={pageRef} id="family-tree-page" className="h-[100dvh] md:h-auto md:min-h-screen bg-gray-50/50 dark:bg-zinc-950 px-3 py-3 sm:px-6 lg:px-8 md:py-8 transition-colors duration-300">
+    <div id="family-tree-page" className="h-[100dvh] md:h-auto md:min-h-screen bg-gray-50/50 dark:bg-zinc-950 px-3 py-3 sm:px-6 lg:px-8 md:py-8 transition-colors duration-300">
       <div className="max-w-7xl mx-auto flex flex-col h-full md:h-[calc(100vh-140px)]">
         {/* Header Block */}
         <div className="hidden md:flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -318,7 +317,9 @@ export const FamilyTree: React.FC = () => {
         <div
           ref={containerRef}
           id="tree-canvas-container"
-          className="flex-1 min-h-0 md:min-h-[400px] border border-gray-200 dark:border-white/5 rounded-2xl bg-white dark:bg-zinc-900 sophisticated-grid-bg shadow-inner relative overflow-hidden flex flex-col items-stretch justify-stretch"
+          className={`flex-1 min-h-0 md:min-h-[400px] bg-white dark:bg-zinc-900 sophisticated-grid-bg relative overflow-hidden flex flex-col items-stretch justify-stretch ${
+            isFullscreen ? 'border-0 rounded-none shadow-none' : 'border border-gray-200 dark:border-white/5 rounded-2xl shadow-inner'
+          }`}
         >
           {loading ? (
             <div className="absolute inset-0 bg-white/60 dark:bg-zinc-900/60 backdrop-blur-xs flex flex-col items-center justify-center gap-3 z-30">
@@ -371,6 +372,29 @@ export const FamilyTree: React.FC = () => {
                   />
                 )}
               />
+              {/* Fullscreen mini-controls (phones): the toolbar is not
+                  part of the fullscreen canvas, so exit + recenter
+                  live here while fullscreen is active. */}
+              {isFullscreen && (
+                <div className="absolute bottom-3 right-3 z-30 flex md:hidden items-center gap-1 bg-white/95 dark:bg-zinc-900/95 backdrop-blur border border-gray-200 dark:border-zinc-800 rounded-2xl shadow-lg p-1">
+                  <button
+                    type="button"
+                    onClick={handleRecenter}
+                    className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-700 dark:text-zinc-200 active:scale-95 transition"
+                    aria-label="Recenter tree"
+                  >
+                    <Maximize2 className="w-5 h-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={toggleFullscreen}
+                    className="w-11 h-11 flex items-center justify-center rounded-xl bg-amber-600 text-white active:scale-95 transition"
+                    aria-label="Exit fullscreen"
+                  >
+                    <Minimize2 className="w-5 h-5" />
+                  </button>
+                </div>
+              )}
               {/* Floating zoom controls */}
               <div className="absolute bottom-3 right-3 z-20 hidden md:flex flex-col items-center gap-1 bg-white/95 dark:bg-zinc-900/95 backdrop-blur border border-gray-200 dark:border-zinc-800 rounded-2xl shadow-lg p-1">
                 <button
