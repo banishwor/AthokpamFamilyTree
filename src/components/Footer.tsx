@@ -52,6 +52,11 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
+                <Link id="footer-link-charts" to="/charts" className="text-gray-500 dark:text-zinc-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors">
+                  Family Charts
+                </Link>
+              </li>
+              <li>
                 <Link id="footer-link-login" to="/login" className="text-gray-500 dark:text-zinc-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors">
                   Administrative Access
                 </Link>

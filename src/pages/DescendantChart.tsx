@@ -1,11 +1,9 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { toPng } from 'html-to-image';
 import toast from 'react-hot-toast';
 import { ChevronLeft, Heart, ImageDown, Loader2, Share2 } from 'lucide-react';
 import useMembers from '../hooks/useMembers';
 import { Member } from '../types';
-import { getDirectPhotoUrl } from '../utils';
 import { fullName } from '../utils/memberSave';
 import {
   buildDescendantTree,
@@ -13,78 +11,16 @@ import {
   treeDepth,
   DescendantNode,
 } from '../utils/descendants';
-
-const CHART_BG = '#FDFBF6';
-const SITE_LINK = 'banishwor.github.io/AthokpamFamilyTree';
-
-function yearOf(dateStr?: string): string {
-  if (!dateStr) return '';
-  // Dates arrive as UTC ISO strings (a 1 Jan 1950 IST birth is stored
-  // as 1949-12-31T18:30Z) — parse, don't slice, or the year shifts.
-  const y = new Date(dateStr).getFullYear();
-  return Number.isNaN(y) ? '' : String(y);
-}
-
-function yearsOf(m: Member): string {
-  const b = yearOf(m.birthDate);
-  const d = yearOf(m.deathDate);
-  if (!b && !d) return '';
-  return d ? `${b} – ${d}` : `b. ${b}`;
-}
-
-function initialsOf(m: Member): string {
-  return `${(m.firstName || '?').charAt(0)}${(m.lastName || '').charAt(0)}`.toUpperCase();
-}
-
-/** One person inside a chart card: photo if it embedded cleanly, else initials. */
-const ChartPerson: React.FC<{ member: Member; photos: Record<string, string> }> = ({ member, photos }) => {
-  const photo = photos[member.id];
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 118 }}>
-      {photo ? (
-        <img
-          src={photo}
-          alt={fullName(member)}
-          style={{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover', border: '2px solid #C3A35F' }}
-        />
-      ) : (
-        <div
-          style={{
-            width: 52,
-            height: 52,
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: 800,
-            fontSize: 17,
-            color: '#fff',
-            background: member.gender === 'F' ? '#DB2777' : '#B08A3C',
-            border: '2px solid #C3A35F',
-          }}
-        >
-          {initialsOf(member)}
-        </div>
-      )}
-      <div
-        style={{
-          marginTop: 7,
-          fontSize: 13.5,
-          fontWeight: 700,
-          lineHeight: 1.25,
-          color: '#292524',
-          textAlign: 'center',
-          wordBreak: 'break-word',
-        }}
-      >
-        {fullName(member)}
-      </div>
-      {yearsOf(member) && (
-        <div style={{ fontSize: 11, color: '#92700C', marginTop: 1 }}>{yearsOf(member)}</div>
-      )}
-    </div>
-  );
-};
+import {
+  CHART_BG,
+  ChartFooter,
+  ChartHeader,
+  ChartPerson,
+  captureChartPng,
+  downloadDataUrl,
+  shareChartImage,
+  useEmbeddedPhotos,
+} from '../components/chartKit';
 
 /** A node in the chart: one person, or a couple side by side. */
 const ChartCouple: React.FC<{ node: DescendantNode; photos: Record<string, string> }> = ({ node, photos }) => (
@@ -136,7 +72,6 @@ const DescendantChart: React.FC = () => {
   const [generations, setGenerations] = useState(3);
   const [includeSpouses, setIncludeSpouses] = useState(true);
   const [exporting, setExporting] = useState(false);
-  const [photos, setPhotos] = useState<Record<string, string>>({});
   const chartRef = useRef<HTMLDivElement>(null);
 
   const root = useMemo(() => members.find((m) => m.id === id) ?? null, [members, id]);
@@ -149,64 +84,27 @@ const DescendantChart: React.FC = () => {
   const descendantCount = tree ? countDescendants(tree) : 0;
   const depthReached = tree ? treeDepth(tree) : 0;
 
-  // Pre-embed portraits as data URLs so the exported PNG can include
-  // them (a plain <img> to Google Drive would be blocked by canvas
-  // security). Any photo that fails simply falls back to initials.
-  useEffect(() => {
-    if (!tree) return;
-    const wanted: Member[] = [];
+  const chartPeople = useMemo(() => {
+    if (!tree) return [] as Member[];
+    const out: Member[] = [];
     const walk = (n: DescendantNode) => {
-      if (n.member.photoUrl) wanted.push(n.member);
-      if (n.spouse?.photoUrl) wanted.push(n.spouse);
+      out.push(n.member);
+      if (n.spouse) out.push(n.spouse);
       n.children.forEach(walk);
     };
     walk(tree);
-    let cancelled = false;
-    wanted
-      .filter((m) => !(m.id in photos))
-      .forEach(async (m) => {
-        const direct = getDirectPhotoUrl(m.photoUrl);
-        if (!direct) return;
-        try {
-          const res = await fetch(direct);
-          if (!res.ok) throw new Error('photo fetch failed');
-          const blob = await res.blob();
-          const dataUrl = await new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(String(reader.result));
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-          });
-          if (!cancelled) setPhotos((prev) => ({ ...prev, [m.id]: dataUrl }));
-        } catch {
-          if (!cancelled) setPhotos((prev) => ({ ...prev, [m.id]: '' }));
-        }
-      });
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return out;
   }, [tree]);
+  const photos = useEmbeddedPhotos(chartPeople);
 
   const fileName = root ? `descendants-of-${fullName(root).toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png` : 'descendant-chart.png';
 
-  const capturePng = async (): Promise<string | null> => {
-    const node = chartRef.current;
-    if (!node) return null;
-    const width = node.scrollWidth;
-    const pixelRatio = width > 2600 ? 1.5 : 2;
-    return toPng(node, { pixelRatio, backgroundColor: CHART_BG, cacheBust: true });
-  };
-
   const handleDownload = async () => {
+    if (!chartRef.current) return;
     setExporting(true);
     try {
-      const dataUrl = await capturePng();
-      if (!dataUrl) throw new Error('nothing to capture');
-      const a = document.createElement('a');
-      a.download = fileName;
-      a.href = dataUrl;
-      a.click();
+      const dataUrl = await captureChartPng(chartRef.current);
+      downloadDataUrl(dataUrl, fileName);
       toast.success('Chart image downloaded — ready to share.');
     } catch {
       toast.error('Could not create the image. Try a smaller generation count.');
@@ -216,21 +114,18 @@ const DescendantChart: React.FC = () => {
   };
 
   const handleShare = async () => {
+    if (!chartRef.current) return;
     setExporting(true);
     try {
-      const dataUrl = await capturePng();
-      if (!dataUrl) throw new Error('nothing to capture');
-      const blob = await (await fetch(dataUrl)).blob();
-      const file = new File([blob], fileName, { type: 'image/png' });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: root ? `Descendants of ${fullName(root)}` : 'Descendant Chart' });
-      } else {
+      const dataUrl = await captureChartPng(chartRef.current);
+      const outcome = await shareChartImage(dataUrl, fileName, root ? `Descendants of ${fullName(root)}` : 'Descendant Chart');
+      if (outcome === 'unsupported') {
         toast('Sharing images is not supported in this browser — use Download instead.', { icon: 'ℹ️' });
+      } else if (outcome === 'error') {
+        toast.error('Could not share the image. Try Download instead.');
       }
-    } catch (err) {
-      // User closing the share sheet is not an error.
-      if (err instanceof DOMException && err.name === 'AbortError') return;
-      toast.error('Could not share the image. Try Download instead.');
+    } catch {
+      toast.error('Could not create the image. Try a smaller generation count.');
     } finally {
       setExporting(false);
     }
@@ -336,39 +231,16 @@ const DescendantChart: React.FC = () => {
                 fontFamily: 'Georgia, "Times New Roman", serif',
               }}
             >
-              <div style={{ textAlign: 'center', marginBottom: 26 }}>
-                <div style={{ fontSize: 12.5, letterSpacing: 3.5, fontWeight: 700, color: '#92700C' }}>
-                  ATHOKPAM FAMILY TREE
-                </div>
-                <div style={{ fontSize: 30, fontWeight: 800, color: '#292524', marginTop: 6 }}>
-                  Descendants of {fullName(root)}
-                </div>
-                <div style={{ fontSize: 13.5, color: '#78716C', marginTop: 5 }}>
-                  {descendantCount} descendant{descendantCount === 1 ? '' : 's'} across {depthReached} generation{depthReached === 1 ? '' : 's'}
-                </div>
-              </div>
-
+              <ChartHeader
+                title={`Descendants of ${fullName(root)}`}
+                subtitle={`${descendantCount} descendant${descendantCount === 1 ? '' : 's'} across ${depthReached} generation${depthReached === 1 ? '' : 's'}`}
+              />
               <div className="dchart">
                 <ul>
                   <ChartNodeLi node={tree} photos={photos} />
                 </ul>
               </div>
-
-              <div
-                style={{
-                  marginTop: 30,
-                  paddingTop: 16,
-                  borderTop: '2px solid #C3A35F',
-                  textAlign: 'center',
-                }}
-              >
-                <div style={{ fontSize: 13.5, fontWeight: 700, color: '#57534E' }}>
-                  Generated using Athokpam Family Tree
-                </div>
-                <div style={{ fontSize: 12.5, color: '#92700C', marginTop: 3 }}>
-                  Developed by Banishwor Athokpam · {SITE_LINK}
-                </div>
-              </div>
+              <ChartFooter />
             </div>
           </div>
         )}

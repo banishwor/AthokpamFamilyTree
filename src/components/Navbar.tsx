@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Shield, LogOut, LogIn, Users, GitMerge, Home, Sparkles } from 'lucide-react';
+import { Menu, X, Shield, LogOut, LogIn, Users, GitMerge, Home, Sparkles, Network } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 
 export const Navbar: React.FC = () => {
@@ -27,6 +27,7 @@ export const Navbar: React.FC = () => {
     { name: 'Family Tree', path: '/tree', icon: <GitMerge className="w-4 h-4" /> },
     { name: 'Browse Members', path: '/members', icon: <Users className="w-4 h-4" /> },
     { name: 'Relationship Finder', path: '/relationship-finder', icon: <GitMerge className="w-4 h-4" /> },
+    { name: 'Charts', path: '/charts', icon: <Network className="w-4 h-4" /> },
   ];
 
   return (

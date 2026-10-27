@@ -5,6 +5,7 @@ import { Member, Ancestor } from '../types';
 import { getDirectPhotoUrl } from '../utils';
 import {
   Network,
+  History,
   Calendar,
   Briefcase,
   MapPin,
@@ -233,6 +234,7 @@ export const MemberProfile: React.FC = () => {
             <ChevronLeft className="w-4 h-4" />
             Back to Directory
           </button>
+          <div className="flex gap-2">
           <button
             id="btn-profile-descendant-chart"
             onClick={() => navigate(`/chart/${member.id}`)}
@@ -241,6 +243,15 @@ export const MemberProfile: React.FC = () => {
             <Network className="w-4 h-4" />
             Descendant Chart
           </button>
+          <button
+            id="btn-profile-ancestor-chart"
+            onClick={() => navigate(`/ancestors/${member.id}`)}
+            className="px-3.5 py-2 bg-white dark:bg-zinc-900 hover:bg-amber-50 dark:hover:bg-zinc-800 border border-amber-600 text-amber-700 dark:text-amber-400 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+          >
+            <History className="w-4 h-4" />
+            Ancestors Chart
+          </button>
+          </div>
         </div>
 
         {/* PROFILE LAYOUT - Responsive Grid */}

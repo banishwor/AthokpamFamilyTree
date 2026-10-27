@@ -15,6 +15,8 @@ import FamilyTree from './pages/FamilyTree';
 import Members from './pages/Members';
 import MemberProfile from './pages/MemberProfile';
 import DescendantChart from './pages/DescendantChart';
+import AncestorsChart from './pages/AncestorsChart';
+import Charts from './pages/Charts';
 import Login from './pages/Login';
 import RelationshipFinder from './pages/RelationshipFinder';
 import QuickUpdate from './pages/QuickUpdate';
@@ -61,6 +63,8 @@ export default function App() {
               <Route path="/members" element={<Members />} />
               <Route path="/member/:id" element={<MemberProfile />} />
               <Route path="/chart/:id" element={<DescendantChart />} />
+              <Route path="/ancestors/:id" element={<AncestorsChart />} />
+              <Route path="/charts" element={<Charts />} />
               <Route path="/relationship-finder" element={<RelationshipFinder />} />
               <Route path="/login" element={<Login />} />
               <Route path="/quick-update" element={<QuickUpdate />} />

@@ -201,3 +201,80 @@
 .dchart > ul > li::after {
   display: none;
 }
+
+/* ---- Ancestors chart (shareable image) ----
+   The .dchart geometry mirrored vertically: the person sits at the
+   bottom, parents fan out above. DOM order stays card-then-list;
+   flex order flips them visually, and the connector band moves to
+   the bottom of each list item. */
+.achart ul {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 24px;
+  position: relative;
+  margin: 0;
+  list-style: none;
+  order: 1;
+}
+.achart li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  padding: 0 10px 24px 10px;
+}
+.achart li > .acard {
+  order: 2;
+}
+.achart li::before,
+.achart li::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 50%;
+  width: 50%;
+  height: 24px;
+  border-bottom: 2px solid #c3a35f;
+}
+.achart li::after {
+  right: auto;
+  left: 50%;
+  border-left: 2px solid #c3a35f;
+}
+.achart li:only-child::before,
+.achart li:only-child::after {
+  display: none;
+}
+.achart li:first-child::before,
+.achart li:last-child::after {
+  border: 0 none;
+}
+.achart li:last-child::before {
+  border-right: 2px solid #c3a35f;
+  border-radius: 0 0 8px 0;
+}
+.achart li:first-child::after {
+  border-radius: 0 0 0 8px;
+}
+.achart ul::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 24px;
+  border-left: 2px solid #c3a35f;
+}
+.achart > ul {
+  padding-bottom: 0;
+}
+.achart > ul::before {
+  display: none;
+}
+.achart > ul > li {
+  padding-bottom: 0;
+}
+.achart > ul > li::before,
+.achart > ul > li::after {
+  display: none;
+}
