@@ -45,14 +45,17 @@ export const MemberProfile: React.FC = () => {
       setAncestorsLoading(true);
       setError(null);
       try {
-        // Fetch all details in parallel for maximum performance
-        const [memberData, parentsData, childrenData, allMembers, ancestorsRes] = await Promise.all([
-          apiService.getMember(id),
-          apiService.getParents(id).catch(() => []),
-          apiService.getChildren(id).catch(() => []),
-          apiService.getMembers().catch(() => []),
+        // Everything except ancestors derives from the shared (cached)
+        // member list — this page used to fire 5 API calls per view.
+        const [allMembers, ancestorsRes] = await Promise.all([
+          apiService.getMembers().catch(() => [] as Member[]),
           apiService.getAncestors(id).catch(() => ({ success: false, data: [] }))
         ]);
+        const memberData = (allMembers || []).find(
+          (m: Member) => String(m.id).trim() === String(id).trim()
+        ) || null;
+        const parentsData: Member[] = [];
+        const childrenData: Member[] = [];
 
         if (memberData && memberData.id) {
           setMember(memberData);

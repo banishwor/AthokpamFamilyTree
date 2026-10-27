@@ -16,7 +16,7 @@ export const AdminSettings: React.FC = () => {
     setDbState('checking');
     try {
       // Real check: fetch the member list from the Apps Script endpoint
-      const members = await apiService.getMembers();
+      const members = await apiService.getMembers({ force: true });
       if (!Array.isArray(members)) {
         throw new Error('Unexpected response from the database endpoint.');
       }
