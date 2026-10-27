@@ -9,7 +9,7 @@ import { Member } from '../types';
 import { fullName, sortedByName } from '../utils/memberSave';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
-import { Loader2, GitMerge, RefreshCw, ZoomIn, ZoomOut, Info, Maximize2, Home } from 'lucide-react';
+import { Loader2, GitMerge, RefreshCw, ZoomIn, ZoomOut, Info, Maximize2, Home, Expand, Minimize2 } from 'lucide-react';
 
 // Custom SVG path drawing function to connect children from the bottom-middle of parents' cards
 const customPathFunc = (link: any) => {
@@ -51,6 +51,37 @@ export const FamilyTree: React.FC = () => {
 
   const [zoom, setZoom] = useState<number>(0.8);
   const containerRef = useRef<HTMLDivElement>(null);
+  const pageRef = useRef<HTMLDivElement>(null);
+
+  // Fullscreen (with landscape lock on Android) — the tree is wide,
+  // so a landscape fullscreen view is its natural shape on a phone.
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  useEffect(() => {
+    const onFsChange = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', onFsChange);
+    return () => document.removeEventListener('fullscreenchange', onFsChange);
+  }, []);
+  const toggleFullscreen = async () => {
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+        return;
+      }
+      const el = pageRef.current as any;
+      if (!el || typeof el.requestFullscreen !== 'function') throw new Error('unsupported');
+      await el.requestFullscreen();
+      // Best-effort landscape lock (Android Chrome/Samsung Internet;
+      // iOS Safari has no orientation lock — fullscreen alone helps).
+      try {
+        await (screen.orientation as any)?.lock?.('landscape');
+      } catch {
+        /* unsupported — ignore */
+      }
+      window.setTimeout(() => handleRecenter(), 350);
+    } catch {
+      toast('Fullscreen is not available in this browser. Try rotating your phone sideways.', { icon: 'ℹ️' });
+    }
+  };
 
   // Member list (shared cache) powers the person search and, for an
   // admin session, the tap-to-edit popup.
@@ -177,7 +208,7 @@ export const FamilyTree: React.FC = () => {
   };
 
   return (
-    <div id="family-tree-page" className="h-[100dvh] md:h-auto md:min-h-screen bg-gray-50/50 dark:bg-zinc-950 px-3 py-3 sm:px-6 lg:px-8 md:py-8 transition-colors duration-300">
+    <div ref={pageRef} id="family-tree-page" className="h-[100dvh] md:h-auto md:min-h-screen bg-gray-50/50 dark:bg-zinc-950 px-3 py-3 sm:px-6 lg:px-8 md:py-8 transition-colors duration-300">
       <div className="max-w-7xl mx-auto flex flex-col h-full md:h-[calc(100vh-140px)]">
         {/* Header Block */}
         <div className="hidden md:flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -234,6 +265,7 @@ export const FamilyTree: React.FC = () => {
               options={searchOptions}
               emptyLabel="-- Find a person in the tree --"
               placeholder="Find a person in the tree"
+              presentation="top"
             />
           </div>
           <button
@@ -251,6 +283,14 @@ export const FamilyTree: React.FC = () => {
             className="w-11 h-11 shrink-0 flex items-center justify-center rounded-xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-300 shadow-sm"
           >
             <RefreshCw className="w-5 h-5" />
+          </button>
+          <button
+            type="button"
+            onClick={toggleFullscreen}
+            aria-label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen landscape view'}
+            className="w-11 h-11 shrink-0 flex items-center justify-center rounded-xl bg-amber-600 text-white shadow-sm active:scale-95 transition"
+          >
+            {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Expand className="w-5 h-5" />}
           </button>
         </div>
 
@@ -359,6 +399,16 @@ export const FamilyTree: React.FC = () => {
                   title="Recenter tree"
                 >
                   <Maximize2 className="w-5 h-5" />
+                </button>
+                <div className="w-6 h-px bg-gray-200 dark:bg-zinc-800" />
+                <button
+                  type="button"
+                  onClick={toggleFullscreen}
+                  className="w-11 h-11 flex items-center justify-center rounded-xl text-gray-700 dark:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 active:scale-95 transition"
+                  aria-label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+                  title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+                >
+                  {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Expand className="w-5 h-5" />}
                 </button>
               </div>
             </div>

@@ -17,6 +17,13 @@ interface SearchableSelectProps {
   /** Shown on the closed button when nothing is selected */
   placeholder?: string;
   disabled?: boolean;
+  /**
+   * 'sheet' (default): bottom sheet on mobile — good for forms.
+   * 'top': panel anchored to the TOP of the screen, so when the
+   * search keyboard opens, the results stay visible and tappable
+   * above it (used by the tree page's person search).
+   */
+  presentation?: 'sheet' | 'top';
 }
 
 /** Shorten a long UUID-style id for display: #A1B2C3D4 */
@@ -39,6 +46,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   emptyLabel,
   placeholder,
   disabled = false,
+  presentation = 'sheet',
 }) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -89,7 +97,11 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
 
       {open && (
         <div
-          className="fixed inset-0 z-[60] bg-black/60 flex items-end sm:items-center justify-center"
+          className={
+            presentation === 'top'
+              ? 'fixed inset-0 z-[60] bg-black/60 flex items-start justify-center px-3 pt-3'
+              : 'fixed inset-0 z-[60] bg-black/60 flex items-end sm:items-center justify-center'
+          }
           onClick={() => {
             setOpen(false);
             setQuery('');
@@ -98,7 +110,11 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           <div
             role="listbox"
             aria-label={placeholder || emptyLabel}
-            className="bg-white dark:bg-zinc-900 w-full sm:max-w-md max-h-[82dvh] rounded-t-3xl sm:rounded-3xl flex flex-col overflow-hidden animate-sheet-up"
+            className={
+              presentation === 'top'
+                ? 'bg-white dark:bg-zinc-900 w-full max-w-md max-h-[58dvh] rounded-3xl flex flex-col overflow-hidden animate-fade-in shadow-2xl'
+                : 'bg-white dark:bg-zinc-900 w-full sm:max-w-md max-h-[82dvh] rounded-t-3xl sm:rounded-3xl flex flex-col overflow-hidden animate-sheet-up'
+            }
             onClick={(e) => e.stopPropagation()}
           >
             {/* Search header */}
