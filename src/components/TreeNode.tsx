@@ -1,14 +1,23 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Pencil } from 'lucide-react';
 import { getDirectPhotoUrl } from '../utils';
 import { useTheme } from '../context/ThemeContext';
 
-const isSafariOrIOS = typeof navigator !== 'undefined' && (
-  /Apple/.test(navigator.vendor) || 
-  /iPhone|iPad|iPod/.test(navigator.userAgent) || 
-  (navigator.maxTouchPoints > 1 && navigator.userAgent.includes('Macintosh'))
-);
+/**
+ * One node of the interactive tree, drawn as PURE SVG (rects, text,
+ * clipped images) — no foreignObject HTML.
+ *
+ * Why: iOS Safari / WKWebView renders foreignObject content at the
+ * wrong position when an ancestor <g> carries the d3 zoom
+ * transform — on iPhone the person cards bunched up at the canvas
+ * corner, detached from the (correctly drawn) connector lines and
+ * dots, so the tree looked "all disconnected". Pure SVG elements
+ * transform identically in every browser, phones included.
+ *
+ * Card geometry (node-local coords): card top at y=12, height 82,
+ * so the bottom edge is y=94. FamilyTree's customPathFunc is tuned
+ * to these numbers — change them together.
+ */
 
 interface TreeNodeProps {
   nodeDatum: any;
@@ -23,6 +32,15 @@ interface TreeNodeProps {
   zoomLevel?: number;
 }
 
+export const CARD_W = 214;
+export const CARD_H = 82;
+export const CARD_TOP = 12;
+
+function truncate(text: string, max: number): string {
+  const t = (text || '').trim();
+  return t.length > max ? `${t.slice(0, max - 1)}…` : t;
+}
+
 export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode, isAdmin, highlightId, onEditMember, zoomLevel }) => {
   const navigate = useNavigate();
   const { resolvedTheme } = useTheme();
@@ -32,7 +50,6 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode, isAdm
   const memberId = nodeDatum.id || nodeDatum.attributes?.id;
   const firstName = nodeDatum.firstName || nodeDatum.name || 'Unknown';
   const lastName = nodeDatum.lastName || '';
-  const fullName = `${firstName} ${lastName}`.trim();
   const gender = nodeDatum.gender || nodeDatum.attributes?.gender || 'M';
   const photoUrl = nodeDatum.photoUrl || nodeDatum.attributes?.photoUrl;
   const occupation = nodeDatum.occupation || nodeDatum.attributes?.occupation || '';
@@ -43,58 +60,29 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode, isAdm
   const spouseObj = nodeDatum.spouse;
   const hasSpouse = !!spouseObj;
 
-  // Find husband and wife to make sure Wife is always on the right side of the husband!
+  // Husband always on the left, wife on the right.
   let husband: any = null;
   let wife: any = null;
 
   if (hasSpouse) {
+    const primary = { id: memberId, firstName, lastName, gender: isPrimaryFemale ? 'F' : 'M', photoUrl, occupation, birthDate };
+    const spouse = {
+      id: spouseObj.id,
+      firstName: spouseObj.firstName,
+      lastName: spouseObj.lastName,
+      gender: isPrimaryFemale ? 'M' : 'F',
+      photoUrl: spouseObj.photoUrl,
+      occupation: spouseObj.occupation,
+      birthDate: spouseObj.birthDate,
+    };
     if (isPrimaryFemale) {
-      wife = {
-        id: memberId,
-        firstName,
-        lastName,
-        gender: 'F',
-        photoUrl,
-        occupation,
-        birthDate,
-      };
-      husband = {
-        id: spouseObj.id,
-        firstName: spouseObj.firstName,
-        lastName: spouseObj.lastName,
-        gender: 'M',
-        photoUrl: spouseObj.photoUrl,
-        occupation: spouseObj.occupation,
-        birthDate: spouseObj.birthDate,
-      };
+      wife = primary;
+      husband = spouse;
     } else {
-      husband = {
-        id: memberId,
-        firstName,
-        lastName,
-        gender: 'M',
-        photoUrl,
-        occupation,
-        birthDate,
-      };
-      wife = {
-        id: spouseObj.id,
-        firstName: spouseObj.firstName,
-        lastName: spouseObj.lastName,
-        gender: 'F',
-        photoUrl: spouseObj.photoUrl,
-        occupation: spouseObj.occupation,
-        birthDate: spouseObj.birthDate,
-      };
+      husband = primary;
+      wife = spouse;
     }
   }
-
-  // Adjust container width based on whether there is a spouse
-  // Generous padding buffers added to prevent iOS/Safari from clipping on scale hover transitions
-  const width = hasSpouse ? 500 : 265;
-  const x = hasSpouse ? -250 : -132.5;
-  const height = 115;
-  const y = 8;
 
   const getInitials = (fName: string, lName: string) => {
     const f = fName ? fName.charAt(0).toUpperCase() : '';
@@ -102,127 +90,106 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode, isAdm
     return `${f}${l}` || 'M';
   };
 
-  const renderMemberCard = (m: any) => {
+  /** One person card as SVG, with its left edge at local x = cx. */
+  const renderMemberCard = (m: any, cx: number) => {
     const isFemaleCard = m.gender === 'F';
     const mFullName = `${m.firstName} ${m.lastName || ''}`.trim();
-
-    // Disable link if it is a virtual root or invalid ID
     const hasValidId = m.id && m.id !== 'undefined' && !String(m.id).startsWith('virtual');
-
-    // To resolve Safari/iOS rendering bug in SVG foreignObject, disable transitions and transforms
-    const transitionClass = isSafariOrIOS ? '' : 'transition-all duration-300 will-change-transform';
-    const hoverScaleClass = isSafariOrIOS || !hasValidId ? '' : 'hover:scale-105 hover:-translate-y-0.5';
-    const hoverBorderClass = isSafariOrIOS
-      ? ''
-      : (isFemaleCard
-          ? 'hover:border-pink-500 hover:shadow-[0_10px_20px_-3px_rgba(244,63,94,0.35),_0_4px_6px_-2px_rgba(244,63,94,0.2)]'
-          : 'hover:border-amber-500 hover:shadow-[0_10px_20px_-3px_rgba(197,160,89,0.35),_0_4px_6px_-2px_rgba(197,160,89,0.2)]');
-
-    // Theme values computed in JS to bypass Safari's dark mode foreignObject boundary selector inheritance bugs
-    const cardBgClass = isDark ? 'bg-zinc-850' : 'bg-white';
-    
-    const cardBorderClass = isFemaleCard
-      ? (isDark ? 'border-pink-950/45' : 'border-pink-200')
-      : (isDark ? 'border-zinc-800/80' : 'border-amber-200/80');
-
-    const avatarBgBorderClass = isDark
-      ? 'bg-zinc-800 border-zinc-700'
-      : 'bg-gray-50 border-gray-100';
-
-    const nameTextClass = isDark
-      ? 'text-zinc-150 group-hover:text-amber-400'
-      : 'text-gray-900 group-hover:text-amber-600';
-
-    const occupationTextClass = isDark ? 'text-zinc-500' : 'text-gray-400';
-    const birthTextClass = isDark ? 'text-zinc-600' : 'text-zinc-400';
-
     const isHighlighted = !!highlightId && hasValidId && String(m.id) === String(highlightId);
+    const clipId = `avatar-clip-${String(m.id || 'x').replace(/[^a-zA-Z0-9_-]/g, '')}`;
+
+    const cardFill = isDark ? '#16181D' : '#FFFFFF';
+    const cardStroke = isHighlighted
+      ? '#F59E0B'
+      : isFemaleCard
+        ? isDark
+          ? '#831843'
+          : '#FBCFE8'
+        : isDark
+          ? '#3F3F46'
+          : '#FDE68A';
+    const nameFill = isDark ? '#E4E4E7' : '#111827';
+    const subFill = isDark ? '#71717A' : '#9CA3AF';
+    const avatarBg = isDark ? '#27272A' : '#F9FAFB';
+
     return (
-      <div
+      <g
+        key={String(m.id || cx)}
         id={`tree-card-member-${m.id}`}
         onClick={(e) => {
           e.stopPropagation();
-          if (hasValidId) {
-            navigate(`/member/${m.id}`);
-          }
+          if (hasValidId) navigate(`/member/${m.id}`);
         }}
-        style={
-          isHighlighted
-            ? { boxShadow: '0 0 0 4px #f59e0b, 0 14px 28px rgba(0,0,0,0.30)', zIndex: 20 }
-            : undefined
-        }
-        className={`relative w-[214px] h-[82px] p-2 border rounded-xl shadow-md flex items-center gap-2.5 text-left ${cardBgClass} ${cardBorderClass} ${transitionClass} ${
-          hasValidId
-            ? `cursor-pointer group ${hoverScaleClass}`
-            : 'cursor-default'
-        } ${hoverBorderClass} ${isHighlighted ? 'border-amber-500' : ''}`}
+        style={{ cursor: hasValidId ? 'pointer' : 'default' }}
       >
+        <rect
+          x={cx}
+          y={0}
+          width={CARD_W}
+          height={CARD_H}
+          rx={12}
+          fill={cardFill}
+          stroke={cardStroke}
+          strokeWidth={isHighlighted ? 3.5 : 1.2}
+        />
+        {/* Avatar: photo (clipped to a rounded square) or initials */}
+        <clipPath id={clipId}>
+          <rect x={cx + 8} y={19} width={44} height={44} rx={9} />
+        </clipPath>
+        <rect x={cx + 8} y={19} width={44} height={44} rx={9} fill={avatarBg} stroke={isDark ? '#3F3F46' : '#F3F4F6'} />
+        {m.photoUrl ? (
+          <image
+            href={getDirectPhotoUrl(m.photoUrl)}
+            x={cx + 8}
+            y={19}
+            width={44}
+            height={44}
+            clipPath={`url(#${clipId})`}
+            preserveAspectRatio="xMidYMid slice"
+          />
+        ) : (
+          <>
+            <rect x={cx + 8} y={19} width={44} height={44} clipPath={`url(#${clipId})`} fill={isFemaleCard ? '#F43F5E' : '#B08A3C'} />
+            <text x={cx + 30} y={41} textAnchor="middle" dominantBaseline="central" fontSize={13} fontWeight={800} fill="#FFFFFF">
+              {getInitials(m.firstName, m.lastName)}
+            </text>
+          </>
+        )}
+        {/* Details */}
+        <text x={cx + 60} y={m.occupation || m.birthDate ? 28 : 36} fontSize={11.5} fontWeight={800} fill={nameFill}>
+          {truncate(mFullName, 24)}
+        </text>
+        {m.occupation ? (
+          <text x={cx + 60} y={44} fontSize={9} fill={subFill}>
+            {truncate(m.occupation, 32)}
+          </text>
+        ) : null}
+        {m.birthDate ? (
+          <text x={cx + 60} y={m.occupation ? 58 : 46} fontSize={8.5} fontFamily="'JetBrains Mono', monospace" fill={subFill}>
+            {truncate(`b. ${m.birthDate}`, 30)}
+          </text>
+        ) : null}
+        {hasValidId && (
+          <text x={cx + 60} y={74} fontSize={8.5} fontWeight={800} fill="#C5A059">
+            View Profile →
+          </text>
+        )}
+        {/* Admin quick-edit pencil */}
         {isAdmin && hasValidId && onEditMember && (
-          <button
-            type="button"
-            aria-label={`Edit ${mFullName}`}
-            title={`Edit ${mFullName}`}
+          <g
             onClick={(e) => {
               e.stopPropagation();
               onEditMember(String(m.id));
             }}
-            className="absolute -top-2.5 -right-2.5 w-8 h-8 rounded-full bg-amber-600 hover:bg-amber-700 text-white shadow-lg border-2 border-white dark:border-zinc-900 flex items-center justify-center z-30 active:scale-95 transition"
+            style={{ cursor: 'pointer' }}
           >
-            <Pencil className="w-3.5 h-3.5" />
-          </button>
+            <circle cx={cx + CARD_W} cy={0} r={11} fill="#D97706" stroke={isDark ? '#0D0E12' : '#FFFFFF'} strokeWidth={2} />
+            <text x={cx + CARD_W} y={0.5} textAnchor="middle" dominantBaseline="central" fontSize={10} fill="#FFFFFF">
+              ✎
+            </text>
+          </g>
         )}
-        {/* Node Avatar */}
-        <div className={`${isSafariOrIOS ? '' : 'relative'} w-11 h-11 flex-shrink-0 rounded-lg overflow-hidden flex items-center justify-center border shadow-inner ${avatarBgBorderClass}`}>
-          {m.photoUrl ? (
-            <img
-              src={getDirectPhotoUrl(m.photoUrl)}
-              alt={mFullName}
-              referrerPolicy="no-referrer"
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div
-              className={`w-full h-full flex items-center justify-center font-bold text-xs text-white ${
-                isFemaleCard
-                  ? 'bg-gradient-to-tr from-pink-500 to-rose-400'
-                  : 'bg-amber-600'
-              }`}
-            >
-              {getInitials(m.firstName, m.lastName)}
-            </div>
-          )}
-          {/* Tiny gender dot (disabled on Safari/iOS to prevent positioning bug inside foreignObject) */}
-          {!isSafariOrIOS && (
-            <div
-              className={`absolute bottom-0.5 right-0.5 w-2 h-2 rounded-full border border-white ${
-                isFemaleCard ? 'bg-pink-500' : 'bg-amber-600'
-              }`}
-            />
-          )}
-        </div>
-
-        {/* Node Details */}
-        <div className="flex-1 min-w-0 pr-1">
-          <h4 className={`text-[11px] font-extrabold truncate transition-colors leading-tight ${nameTextClass}`}>
-            {mFullName}
-          </h4>
-          {m.occupation ? (
-            <p className={`text-[9px] truncate leading-none mt-1 ${occupationTextClass}`}>
-              {m.occupation}
-            </p>
-          ) : null}
-          {m.birthDate && (
-            <p className={`text-[8px] font-mono leading-none mt-1 ${birthTextClass}`}>
-              b. {m.birthDate}
-            </p>
-          )}
-          {hasValidId && (
-            <span className="text-[8px] inline-block font-black text-[#c5a059] mt-1 hover:underline">
-              View Profile →
-            </span>
-          )}
-        </div>
-      </div>
+      </g>
     );
   };
 
@@ -233,8 +200,10 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode, isAdm
       {/* Circle to trigger native node toggle, positioned in the exact horizontal center */}
       <circle
         r="11"
-        fill={hasSpouse ? '#c5a059' : (isPrimaryFemale ? '#f43f5e' : '#c5a059')}
-        className={`cursor-pointer hover:scale-120 transition-transform shadow-md stroke-2 ${isDark ? 'stroke-zinc-950' : 'stroke-white'}`}
+        fill={hasSpouse ? '#c5a059' : isPrimaryFemale ? '#f43f5e' : '#c5a059'}
+        stroke={isDark ? '#0D0E12' : '#FFFFFF'}
+        strokeWidth={2}
+        style={{ cursor: 'pointer' }}
         onClick={toggleNode}
       />
       {hasChildren && (zoomLevel ?? 1) >= 0.6 && (
@@ -251,42 +220,23 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode, isAdm
         </text>
       )}
 
-      {/* HTML Card Container inside SVG using foreignObject */}
-      <foreignObject
-        width={width}
-        height={height}
-        x={x}
-        y={y}
-        style={{ overflow: 'visible' }}
-      >
+      {/* Person card(s), hanging below the toggle dot */}
+      <g transform={`translate(0 ${CARD_TOP})`}>
         {hasSpouse ? (
-          // Custom side-by-side spouse rendering wrapped in standard XHTML xmlns namespace for perfect Safari compliance.
-          // Explicit pixel size, not w-full/h-full: Safari resolves
-          // percentage heights inside foreignObject unreliably, which
-          // can shift the cards away from the connector lines.
-          <div xmlns="http://www.w3.org/1999/xhtml" style={{ width, height }} className="flex items-center justify-center gap-1.5 py-2">
-            {/* Husband Card (Left Side) */}
-            {husband && renderMemberCard(husband)}
-
-            {/* Elegant Partnership Link Element with Intersecting Heart */}
-            <div
-              className={`flex-shrink-0 flex items-center justify-center w-5.5 h-5.5 rounded-full border text-amber-500/90 -mx-1 shadow-sm cursor-pointer ${
-                isSafariOrIOS
-                  ? 'bg-amber-50 dark:bg-zinc-800 border-amber-500/20'
-                  : 'bg-amber-500/10 border-amber-500/20 z-10 backdrop-blur-md animate-pulse hover:scale-120 duration-300 transition-transform'
-              }`}
-              title="Spousal union"
-            >
-              <Heart className="w-3 h-3 fill-amber-500 text-amber-500" />
-            </div>
-
-            {/* Wife Card (Right Side) */}
-            {wife && renderMemberCard(wife)}
-          </div>
+          <>
+            {husband && renderMemberCard(husband, -228)}
+            {/* Partnership heart between the two cards */}
+            <g>
+              <circle cx={0} cy={41} r={10.5} fill={isDark ? '#27272A' : '#FFFBEB'} stroke="#C5A059" strokeWidth={1} />
+              <text x={0} y={41.5} textAnchor="middle" dominantBaseline="central" fontSize={10} fill="#D97706">
+                ♥
+              </text>
+            </g>
+            {wife && renderMemberCard(wife, 14)}
+          </>
         ) : (
-          // Single Member Card rendering wrapped in standard XHTML xmlns namespace for perfect Safari compliance
-          <div xmlns="http://www.w3.org/1999/xhtml" style={{ width, height }} className="flex items-center justify-center py-2">
-            {renderMemberCard({
+          renderMemberCard(
+            {
               id: memberId,
               firstName,
               lastName,
@@ -294,10 +244,11 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode, isAdm
               photoUrl,
               occupation,
               birthDate,
-            })}
-          </div>
+            },
+            -CARD_W / 2
+          )
         )}
-      </foreignObject>
+      </g>
     </g>
   );
 };

@@ -11,21 +11,21 @@ import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import { Loader2, GitMerge, RefreshCw, ZoomIn, ZoomOut, Info, Crosshair, Home, Expand, Minimize2 } from 'lucide-react';
 
-// Custom SVG path drawing function to connect children from the bottom-middle of parents' cards
+// Custom SVG path drawing function to connect children from the bottom-middle of parents' cards.
+// TreeNode draws pure-SVG cards with their top at node y+12 and
+// bottom edge at y+94 (CARD_TOP/CARD_H in TreeNode.tsx). The line
+// starts a few px INSIDE the parent card and ends a few px UNDER
+// the child card's top edge — links paint below nodes, so the card
+// fills cover the overlaps and the visible line runs continuously
+// card → dot → card. (Ending the line at the node point left a
+// white gap under the dot, which is what made the tree look
+// disconnected, worst on iPhone.)
 const customPathFunc = (link: any) => {
   const { source, target } = link;
   const startX = source.x;
-  // Card height is 82px and they are positioned at y = 20.
-  // So the bottom edge of the parents' cards is exactly at source.y + 102
-  const startY = source.y + 102;
+  const startY = source.y + 90;
   const endX = target.x;
-  // The child card's top edge sits ~24px below the node point (the
-  // toggle dot is at the point, the foreignObject card hangs under
-  // it). Ending the line at the point left a visible white gap
-  // between dot and card — the tree looked disconnected, worst on
-  // iPhone. Run the line to +30 so it passes the dot and tucks just
-  // under the card's top edge (cards paint over the overlap).
-  const endY = target.y + 30;
+  const endY = target.y + 16;
 
   // Let's find the midway point vertically between the parent bottom and child top joint
   const midY = (startY + endY) / 2;
