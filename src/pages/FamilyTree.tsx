@@ -172,43 +172,35 @@ export const FamilyTree: React.FC = () => {
         });
         return;
       }
-      // Accumulate the translate() of every ancestor up to (but not
-      // including) the zoom container, whose transform also carries
-      // the scale. The pure-SVG card sits inside a local
-      // translate(0, CARD_TOP) group under the node group; taking
-      // only the FIRST translate found — the old behaviour — reads
-      // that local offset as the node position and the view flies
-      // to the wrong place.
-      let nx = 0;
-      let ny = 0;
-      let found = false;
-      let node: Element | null = card.parentElement;
-      while (node && node.tagName.toLowerCase() !== 'svg') {
-        const t = node.getAttribute?.('transform') || '';
-        if (t.includes('scale')) break;
-        const m = /translate\(\s*([-\d.]+)[,\s]+([-\d.]+)\s*\)/.exec(t);
-        if (m) {
-          nx += parseFloat(m[1]);
-          ny += parseFloat(m[2]);
-          found = true;
-        }
-        node = node.parentElement;
-      }
-      if (!found) {
+      // Locate the card by MEASURING it, not by parsing transforms:
+      // rd3t positions its node groups imperatively (and animates
+      // them from the parent's position), so attribute archaeology
+      // kept reading stale or partial positions — deep leaf nodes
+      // (Jugeshwor) landed wrong while mid-tree nodes worked.
+      // getBoundingClientRect is ground truth in every browser.
+      //   screen = tree * zoom + translate  ⇒  tree = (screen - t)/z
+      const cRect = container.getBoundingClientRect();
+      const r = (card as unknown as SVGGraphicsElement).getBoundingClientRect();
+      if (!r.width || !r.height) {
         toast.error('Could not locate that person on the tree.');
         return;
       }
+      const screenCx = r.left + r.width / 2 - cRect.left;
+      const screenCy = r.top + r.height / 2 - cRect.top;
+      const treeX = (screenCx - translate.x) / zoom;
+      const treeY = (screenCy - translate.y) / zoom;
       const z = Math.min(1.1, Math.max(zoom, 0.95));
       setZoom(z);
-      // Aim at the card's centre (the card hangs below the node
-      // point: top +20, height 82, so centre ≈ node y + 60).
-      setTranslate({ x: dimensions.width / 2 - nx * z, y: dimensions.height * 0.42 - (ny + 60) * z });
+      setTranslate({
+        x: cRect.width / 2 - treeX * z,
+        y: cRect.height * 0.45 - treeY * z,
+      });
       setHighlightId(memberId);
       window.setTimeout(() => {
         setHighlightId((cur) => (cur === memberId ? null : cur));
       }, 4500);
     },
-    [dimensions, zoom]
+    [zoom, translate]
   );
 
   const searchOptions = sortedByName(allMembers).map((m) => ({ id: String(m.id), name: fullName(m) }));
