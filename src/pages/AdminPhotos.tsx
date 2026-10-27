@@ -1,11 +1,14 @@
 import React, { useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import PhotoUploader from '../components/PhotoUploader';
+import MobilePortraits from '../components/mobile/MobilePortraits';
+import useMembers from '../hooks/useMembers';
 import { Image as ImageIcon, Camera, ArrowLeft, Info, HelpCircle } from 'lucide-react';
 
 export const AdminPhotos: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { members, loading, refresh } = useMembers();
 
   // Retrieve any auto-selected memberId from query, e.g. /admin/photos?memberId=1003
   const preSelectedMemberId = useMemo(() => {
@@ -14,7 +17,11 @@ export const AdminPhotos: React.FC = () => {
 
   return (
     <div id="admin-photos-page" className="min-h-screen bg-gray-50/50 dark:bg-zinc-950 px-4 sm:px-6 lg:px-8 pt-8 pb-24 md:pb-8 transition-colors duration-300">
-      <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
+      {/* Phones: Phase B portraits grid + missing-portraits worklist */}
+      <div className="md:hidden max-w-7xl mx-auto">
+        <MobilePortraits members={members} loading={loading} onRefresh={refresh} />
+      </div>
+      <div className="hidden md:block max-w-3xl mx-auto space-y-6 animate-fade-in">
         
         {/* Navigation back and title */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 dark:border-zinc-850 pb-6">
