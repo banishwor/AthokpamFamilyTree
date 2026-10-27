@@ -61,20 +61,21 @@ const AncestorLi: React.FC<{ node: AncestorNode; photos: Record<string, string>;
   <li>
     <AncestorCard node={node} photos={photos} />
     {/* Vertical stub from this card down to the connector bar below.
-        A real element, not a pseudo-element border: the pseudo
-        version intermittently rendered a few px short of the card
-        for the last parent in a row, leaving a visible gap. */}
+        In normal flow, directly under the card (order 3 in the li's
+        flex column), so contact with the card is by construction.
+        Earlier versions positioned this stub absolutely (and before
+        that as a pseudo-element border); both intermittently left a
+        few-px gap under one parent card (Thouranishabi) while the
+        others connected, for reasons the live DOM never revealed. */}
     {!isRoot && (
-      <span
+      <div
         aria-hidden
         style={{
-          position: 'absolute',
-          left: '50%',
-          bottom: 0,
+          order: 3,
           width: 2,
-          height: 26,
-          marginLeft: -1,
+          height: 24,
           background: '#C3A35F',
+          flexShrink: 0,
         }}
       />
     )}

@@ -223,7 +223,11 @@
   align-items: center;
   justify-content: flex-end;
   position: relative;
-  padding: 0 10px 24px 10px;
+  /* No bottom padding: the 24px connector band below each card is
+     the in-flow stub element rendered by AncestorLi, and the
+     ::before/::after horizontal bar (height 24, anchored to the
+     li's bottom) sits exactly across the stub's lower end. */
+  padding: 0 10px 0 10px;
 }
 .achart li > .acard {
   order: 2;
