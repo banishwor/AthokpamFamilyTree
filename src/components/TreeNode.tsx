@@ -260,8 +260,11 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode, isAdm
         style={{ overflow: 'visible' }}
       >
         {hasSpouse ? (
-          // Custom side-by-side spouse rendering wrapped in standard XHTML xmlns namespace for perfect Safari compliance
-          <div xmlns="http://www.w3.org/1999/xhtml" className="flex items-center justify-center gap-1.5 w-full h-full py-2">
+          // Custom side-by-side spouse rendering wrapped in standard XHTML xmlns namespace for perfect Safari compliance.
+          // Explicit pixel size, not w-full/h-full: Safari resolves
+          // percentage heights inside foreignObject unreliably, which
+          // can shift the cards away from the connector lines.
+          <div xmlns="http://www.w3.org/1999/xhtml" style={{ width, height }} className="flex items-center justify-center gap-1.5 py-2">
             {/* Husband Card (Left Side) */}
             {husband && renderMemberCard(husband)}
 
@@ -282,7 +285,7 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ nodeDatum, toggleNode, isAdm
           </div>
         ) : (
           // Single Member Card rendering wrapped in standard XHTML xmlns namespace for perfect Safari compliance
-          <div xmlns="http://www.w3.org/1999/xhtml" className="w-full h-full flex items-center justify-center py-2">
+          <div xmlns="http://www.w3.org/1999/xhtml" style={{ width, height }} className="flex items-center justify-center py-2">
             {renderMemberCard({
               id: memberId,
               firstName,

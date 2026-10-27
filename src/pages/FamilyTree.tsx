@@ -19,7 +19,13 @@ const customPathFunc = (link: any) => {
   // So the bottom edge of the parents' cards is exactly at source.y + 102
   const startY = source.y + 102;
   const endX = target.x;
-  const endY = target.y;
+  // The child card's top edge sits ~24px below the node point (the
+  // toggle dot is at the point, the foreignObject card hangs under
+  // it). Ending the line at the point left a visible white gap
+  // between dot and card — the tree looked disconnected, worst on
+  // iPhone. Run the line to +30 so it passes the dot and tucks just
+  // under the card's top edge (cards paint over the overlap).
+  const endY = target.y + 30;
 
   // Let's find the midway point vertically between the parent bottom and child top joint
   const midY = (startY + endY) / 2;
