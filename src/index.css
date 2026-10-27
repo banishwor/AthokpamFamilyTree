@@ -210,6 +210,7 @@
 .achart ul {
   display: flex;
   justify-content: center;
+  align-items: flex-end;
   padding-bottom: 24px;
   position: relative;
   margin: 0;
@@ -220,6 +221,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-end;
   position: relative;
   padding: 0 10px 24px 10px;
 }
